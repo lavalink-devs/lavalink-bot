@@ -1,0 +1,18 @@
+log:
+  level: 2
+  add_source: false
+
+bot:
+  token: ...
+  guild_ids: [ ... ]
+
+nodes:
+  - name: node1
+    address: localhost:2333
+    password: youshallnotpass
+    secure: false
+    session_id: ...
+
+plugins:
+  - dependency: ...
+    repository: ...

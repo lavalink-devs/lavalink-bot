@@ -23,6 +23,7 @@ import (
 
 func main() {
 	path := flag.String("config", "config.yml", "path to config.yml")
+	flag.Parse()
 
 	cfg, err := lavalinkbot.ReadConfig(*path)
 	if err != nil {

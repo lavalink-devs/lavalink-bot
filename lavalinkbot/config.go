@@ -21,13 +21,13 @@ var defaultConfig = Config{
 func ReadConfig(path string) (Config, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		return Config{}, fmt.Errorf("failed to open config.yaml: %w", err)
+		return Config{}, fmt.Errorf("failed to open config: %w", err)
 	}
 	defer file.Close()
 
 	cfg := defaultConfig
 	if err = yaml.NewDecoder(file).Decode(&cfg); err != nil {
-		return Config{}, fmt.Errorf("failed to decode config.yaml: %w", err)
+		return Config{}, fmt.Errorf("failed to decode config: %w", err)
 	}
 	return cfg, nil
 }

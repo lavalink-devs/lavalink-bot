@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/disgoorg/disgo/bot"
-	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/log"
 	"github.com/google/go-github/v52/github"
@@ -44,18 +43,4 @@ func (b *Bot) Stop() {
 	b.HTTPClient.CloseIdleConnections()
 	b.Lavalink.Close()
 	b.Client.Close(ctx)
-}
-
-func (b *Bot) OnVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {
-	if event.VoiceState.UserID != b.Client.ApplicationID() {
-		return
-	}
-	b.Lavalink.OnVoiceStateUpdate(context.TODO(), event.VoiceState.GuildID, event.VoiceState.ChannelID, event.VoiceState.SessionID)
-	if event.VoiceState.ChannelID == nil {
-		b.MusicQueue.Delete(event.VoiceState.GuildID)
-	}
-}
-
-func (b *Bot) OnVoiceServerUpdate(event *events.VoiceServerUpdate) {
-	b.Lavalink.OnVoiceServerUpdate(context.TODO(), event.GuildID, event.Token, *event.Endpoint)
 }

@@ -22,7 +22,7 @@ var decode = discord.SlashCommandCreate{
 	},
 }
 
-func (c *Cmds) Decode(e *handler.CommandEvent) error {
+func (c *Commands) Decode(e *handler.CommandEvent) error {
 	track := e.SlashCommandInteractionData().String("track")
 
 	if err := e.DeferCreateMessage(false); err != nil {

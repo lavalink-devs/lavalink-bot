@@ -5,13 +5,13 @@ import (
 	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 )
 
-var Commands = []discord.ApplicationCommandCreate{
+var CommandCreates = []discord.ApplicationCommandCreate{
 	decode,
 	info,
 	latest,
 	music,
 }
 
-type Cmds struct {
+type Commands struct {
 	*lavalinkbot.Bot
 }

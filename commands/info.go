@@ -1,12 +1,13 @@
 package commands
 
 import (
+	"context"
 	"fmt"
+	"github.com/disgoorg/disgolink/v3/disgolink"
 
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/disgolink/v3/disgolink"
 )
 
 var info = discord.SlashCommandCreate{
@@ -14,12 +15,39 @@ var info = discord.SlashCommandCreate{
 	Description: "Shows info about this bot",
 }
 
-func (c *Cmds) Info(e *handler.CommandEvent) error {
+func (c *Commands) Info(e *handler.CommandEvent) error {
+	var fields []discord.EmbedField
+	c.Lavalink.ForNodes(func(node disgolink.Node) {
+		version, err := node.Version(context.TODO())
+		var versionString string
+		if err != nil {
+			versionString = err.Error()
+		} else {
+			versionString = version
+		}
+		fields = append(fields, discord.EmbedField{
+			Name:  node.Config().Name,
+			Value: fmt.Sprintf("`%s`", versionString),
+		})
+	})
 	return e.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{
 			{
-				Title:       "Lavalink Bot",
-				Description: fmt.Sprintf("This bot is running on [disgo](https://github.com/disgoorg/disgo) `%s` and [disgolink](https://github.com/disgoorg/disgolink) `%s`.\n", disgo.Version, disgolink.Version),
+				Title: "Lavalink Bot",
+				Fields: append([]discord.EmbedField{
+					{
+						Name:  "Source",
+						Value: "[GitHub](https://github.com/lavalink-devs/lavalionk-bot)",
+					},
+					{
+						Name:  "DisGo",
+						Value: fmt.Sprintf("`%s`", disgo.Version),
+					},
+					{
+						Name:  "DisGoLink",
+						Value: fmt.Sprintf("`%s`", disgolink.Version),
+					},
+				}, fields...),
 			},
 		},
 	})

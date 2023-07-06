@@ -18,7 +18,7 @@ var (
 	queryPattern = regexp.MustCompile(`^(.{2})(search|isrc):(.+)`)
 )
 
-func (c *Cmds) Play(e *handler.CommandEvent) error {
+func (c *Commands) Play(e *handler.CommandEvent) error {
 	voiceState, ok := c.Client.Caches().VoiceState(*e.GuildID(), e.User().ID)
 	if !ok {
 		return e.CreateMessage(discord.MessageCreate{
@@ -42,72 +42,54 @@ func (c *Cmds) Play(e *handler.CommandEvent) error {
 	if err := e.DeferCreateMessage(false); err != nil {
 		return err
 	}
-	go loadTracks(c, e, voiceState, identifier)
-	return nil
-}
 
-func loadTracks(c *Cmds, e *handler.CommandEvent, voiceState discord.VoiceState, identifier string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	result, err := c.Lavalink.BestNode().LoadTracks(ctx, identifier)
 	if err != nil {
-		_, _ = e.UpdateInteractionResponse(discord.MessageUpdate{
+		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr(fmt.Sprintf("Failed to load tracks: %s", err)),
 		})
-		return
+		return err
 	}
 
 	var (
-		tracks       []lavalink.Track
-		playlistName string
+		tracks         []lavalink.Track
+		messageContent string
 	)
-	switch data := result.Data.(type) {
+	switch loadData := result.Data.(type) {
 	case lavalink.Track:
-		tracks = append(tracks, data)
+		tracks = append(tracks, loadData)
+		messageContent = fmt.Sprintf("Loaded track **%s**", res.FormatTrack(loadData, 0))
 	case lavalink.Playlist:
-		tracks = append(tracks, data.Tracks...)
-		playlistName = data.Info.Name
+		tracks = append(tracks, loadData.Tracks...)
+		messageContent = fmt.Sprintf("Loaded playlist **%s** with %d tracks", loadData.Info.Name, len(tracks))
 	case lavalink.Search:
-		fmt.Printf("search: %+v\n", data)
-		tracks = append(tracks, data[0])
+		tracks = append(tracks, loadData[0])
+		messageContent = fmt.Sprintf("Loaded track **%s** from search", res.FormatTrack(loadData[0], 0))
 	case lavalink.Empty:
-		if _, err = e.UpdateInteractionResponse(discord.MessageUpdate{
+		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr("No matches found"),
-		}); err != nil {
-			c.Client.Logger().Errorf("failed to update interaction response: %s", err)
-		}
-		return
+		})
+		return err
 	case lavalink.Exception:
-		if _, err = e.UpdateInteractionResponse(discord.MessageUpdate{
-			Content: json.Ptr(fmt.Sprintf("Failed to load tracks: %s", data.Error())),
-		}); err != nil {
-			c.Client.Logger().Errorf("failed to update interaction response: %s", err)
-		}
-		return
-	}
-
-	var content string
-	if playlistName != "" {
-		content = fmt.Sprintf("Loaded playlist **%s** with %d tracks", playlistName, len(tracks))
-	} else if len(tracks) == 1 {
-		content = fmt.Sprintf("Loaded track **%s**", res.FormatTrack(tracks[0], 0))
-	} else {
-		content = fmt.Sprintf("Loaded **%d** tracks", len(tracks))
+		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
+			Content: json.Ptr(fmt.Sprintf("Failed to load tracks: %s", loadData.Error())),
+		})
+		return err
 	}
 
 	if _, err = e.UpdateInteractionResponse(discord.MessageUpdate{
-		Content: &content,
+		Content: &messageContent,
 	}); err != nil {
-		c.Client.Logger().Errorf("failed to update interaction response: %s", err)
+		return err
 	}
 
 	if err = c.Client.UpdateVoiceState(context.Background(), *e.GuildID(), voiceState.ChannelID, false, false); err != nil {
-		if _, err = e.CreateFollowupMessage(discord.MessageCreate{
+		_, err = e.CreateFollowupMessage(discord.MessageCreate{
 			Content: fmt.Sprintf("Failed to join voice channel: %s", err),
-		}); err != nil {
-			c.Client.Logger().Errorf("failed to create followup message: %s", err)
-			return
-		}
+		})
+		return err
 	}
 
 	player := c.Lavalink.Player(*e.GuildID())
@@ -123,15 +105,14 @@ func loadTracks(c *Cmds, e *handler.CommandEvent, voiceState discord.VoiceState,
 		playCtx, playCancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer playCancel()
 		if err = player.Update(playCtx, lavalink.WithTrack(track)); err != nil {
-			if _, err = e.CreateFollowupMessage(discord.MessageCreate{
+			_, err = e.CreateFollowupMessage(discord.MessageCreate{
 				Content: fmt.Sprintf("Failed to play track: %s", err),
-			}); err != nil {
-				c.Client.Logger().Errorf("failed to create followup message: %s", err)
-			}
-			return
+			})
+			return err
 		}
 	}
 	if len(tracks) > 0 {
 		c.MusicQueue.Add(*e.GuildID(), e.Channel().ID(), tracks...)
 	}
+	return nil
 }

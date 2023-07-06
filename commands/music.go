@@ -299,7 +299,7 @@ var music = discord.SlashCommandCreate{
 	},
 }
 
-func (c *Cmds) RequirePlayer(next handler.Handler) handler.Handler {
+func (c *Commands) RequirePlayer(next handler.Handler) handler.Handler {
 	return func(e *events.InteractionCreate) error {
 		if e.Type() == discord.InteractionTypeApplicationCommand {
 			if player := c.Lavalink.ExistingPlayer(*e.GuildID()); player == nil {

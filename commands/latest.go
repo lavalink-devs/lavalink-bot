@@ -24,7 +24,7 @@ var latest = discord.SlashCommandCreate{
 	},
 }
 
-func (c *Cmds) LatestAutocomplete(e *handler.AutocompleteEvent) error {
+func (c *Commands) LatestAutocomplete(e *handler.AutocompleteEvent) error {
 	options := []string{"lavalink"}
 	for _, plugin := range c.Cfg.Plugins {
 		options = append(options, plugin.Dependency)
@@ -46,7 +46,7 @@ func (c *Cmds) LatestAutocomplete(e *handler.AutocompleteEvent) error {
 	return e.Result(choices)
 }
 
-func (c *Cmds) Latest(e *handler.CommandEvent) error {
+func (c *Commands) Latest(e *handler.CommandEvent) error {
 	if err := e.DeferCreateMessage(false); err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func (c *Cmds) Latest(e *handler.CommandEvent) error {
 	return err
 }
 
-func getLatestEmbed(c *Cmds, latestType string) (*discord.Embed, error) {
+func getLatestEmbed(c *Commands, latestType string) (*discord.Embed, error) {
 	if latestType == "lavalink" {
 		release, _, err := c.GitHub.Repositories.GetLatestRelease(context.Background(), "lavalink-devs", "Lavalink")
 		if err != nil {

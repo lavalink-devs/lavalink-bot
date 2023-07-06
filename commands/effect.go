@@ -97,7 +97,7 @@ var effects = map[EffectType]lavalink.Filters{
 	},
 }
 
-func (c *Cmds) Effects(e *handler.CommandEvent) error {
+func (c *Commands) Effects(e *handler.CommandEvent) error {
 	effectType := EffectType(e.SlashCommandInteractionData().String("effect"))
 	if err := c.Lavalink.ExistingPlayer(*e.GuildID()).Update(context.Background(), lavalink.WithFilters(effects[effectType])); err != nil {
 		return e.CreateMessage(discord.MessageCreate{

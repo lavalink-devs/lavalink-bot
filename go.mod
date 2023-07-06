@@ -3,7 +3,7 @@ module github.com/lavalink-devs/lavalink-bot
 go 1.20
 
 require (
-	github.com/disgoorg/disgo v0.16.7
+	github.com/disgoorg/disgo v0.16.8-0.20230706122238-b331ced0cf92
 	github.com/disgoorg/disgolink/v3 v3.0.0-20230706003159-13e680d82a24
 	github.com/disgoorg/json v1.1.0
 	github.com/disgoorg/log v1.2.0

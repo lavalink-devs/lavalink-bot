@@ -9,7 +9,7 @@ import (
 	"github.com/disgoorg/disgolink/v3/lavalink"
 )
 
-func (c *Cmds) Stop(e *handler.CommandEvent) error {
+func (c *Commands) Stop(e *handler.CommandEvent) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	player := c.Lavalink.ExistingPlayer(*e.GuildID())

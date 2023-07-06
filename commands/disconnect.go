@@ -8,7 +8,7 @@ import (
 	"github.com/disgoorg/disgo/handler"
 )
 
-func (c *Cmds) Disconnect(e *handler.CommandEvent) error {
+func (c *Commands) Disconnect(e *handler.CommandEvent) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 

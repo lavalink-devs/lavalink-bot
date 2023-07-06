@@ -4,6 +4,6 @@ import (
 	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 )
 
-type Hdlr struct {
+type Handlers struct {
 	*lavalinkbot.Bot
 }

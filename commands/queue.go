@@ -8,7 +8,7 @@ import (
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 
-func (c *Cmds) Queue(e *handler.CommandEvent) error {
+func (c *Commands) Queue(e *handler.CommandEvent) error {
 	_, tracks := c.MusicQueue.Get(*e.GuildID())
 	if len(tracks) == 0 {
 		return e.CreateMessage(discord.MessageCreate{
@@ -16,7 +16,7 @@ func (c *Cmds) Queue(e *handler.CommandEvent) error {
 		})
 	}
 
-	content := fmt.Sprintf("**Queue(%d):**\n")
+	content := fmt.Sprintf("**Queue(%d):**\n", len(tracks))
 	for i, track := range tracks {
 		content += fmt.Sprintf("%d. %s\n", i+1, res.FormatTrack(track, 0))
 	}

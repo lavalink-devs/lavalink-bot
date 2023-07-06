@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"github.com/disgoorg/disgo/handler/middleware"
 	"net/http"
 	"os"
 	"os/signal"
@@ -46,8 +47,9 @@ func main() {
 		MusicQueue: lavalinkbot.NewPlayerManager(),
 	}
 
-	cmds := &commands.Cmds{Bot: b}
+	cmds := &commands.Commands{Bot: b}
 	r := handler.New()
+	r.Use(middleware.Go)
 	r.Command("/info", cmds.Info)
 	r.Command("/latest", cmds.Latest)
 	r.Autocomplete("/latest", cmds.LatestAutocomplete)
@@ -81,7 +83,7 @@ func main() {
 		})
 	})
 
-	hdlr := &handlers.Hdlr{Bot: b}
+	hdlr := &handlers.Handlers{Bot: b}
 
 	if b.Client, err = disgo.New(cfg.Bot.Token,
 		bot.WithGatewayConfigOpts(
@@ -90,14 +92,14 @@ func main() {
 		bot.WithCacheConfigOpts(
 			cache.WithCaches(cache.FlagVoiceStates),
 		),
-		bot.WithEventListenerFunc(b.OnVoiceStateUpdate),
-		bot.WithEventListenerFunc(b.OnVoiceServerUpdate),
 		bot.WithEventListeners(r),
+		bot.WithEventListenerFunc(hdlr.OnVoiceStateUpdate),
+		bot.WithEventListenerFunc(hdlr.OnVoiceServerUpdate),
 	); err != nil {
 		log.Fatal("failed to create disgo client: ", err)
 	}
 
-	if err = handler.SyncCommands(b.Client, commands.Commands, b.Cfg.Bot.GuildIDs); err != nil {
+	if err = handler.SyncCommands(b.Client, commands.CommandCreates, b.Cfg.Bot.GuildIDs); err != nil {
 		log.Errorf("failed to sync commands: %s", err)
 	}
 

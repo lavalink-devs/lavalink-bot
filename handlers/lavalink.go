@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"github.com/disgoorg/disgo/events"
 	"time"
 
 	"github.com/disgoorg/disgo/discord"
@@ -11,7 +12,42 @@ import (
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 
-func (h *Hdlr) OnTrackStart(p disgolink.Player, event lavalink.TrackStartEvent) {
+func (h *Handlers) OnVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {
+	if event.VoiceState.UserID != h.Client.ApplicationID() {
+		_, ok := h.Client.Caches().VoiceState(event.VoiceState.GuildID, h.Client.ApplicationID())
+		if !ok || event.OldVoiceState.ChannelID == nil {
+			return
+		}
+		var voiceStates int
+		h.Client.Caches().VoiceStatesForEach(event.VoiceState.GuildID, func(vs discord.VoiceState) {
+			if *vs.ChannelID == *event.OldVoiceState.ChannelID {
+				voiceStates++
+			}
+		})
+		if voiceStates <= 1 {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			if err := h.Client.UpdateVoiceState(ctx, event.VoiceState.GuildID, nil, false, false); err != nil {
+				log.Errorf("failed to disconnect from voice channel: %s", err)
+			}
+		}
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	h.Lavalink.OnVoiceStateUpdate(ctx, event.VoiceState.GuildID, event.VoiceState.ChannelID, event.VoiceState.SessionID)
+	if event.VoiceState.ChannelID == nil {
+		h.MusicQueue.Delete(event.VoiceState.GuildID)
+	}
+}
+
+func (h *Handlers) OnVoiceServerUpdate(event *events.VoiceServerUpdate) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	h.Lavalink.OnVoiceServerUpdate(ctx, event.GuildID, event.Token, *event.Endpoint)
+}
+
+func (h *Handlers) OnTrackStart(p disgolink.Player, event lavalink.TrackStartEvent) {
 	channelID := h.MusicQueue.ChannelID(p.GuildID())
 	if channelID == 0 {
 		return
@@ -23,7 +59,7 @@ func (h *Hdlr) OnTrackStart(p disgolink.Player, event lavalink.TrackStartEvent) 
 	}
 }
 
-func (h *Hdlr) OnTrackEnd(p disgolink.Player, event lavalink.TrackEndEvent) {
+func (h *Handlers) OnTrackEnd(p disgolink.Player, event lavalink.TrackEndEvent) {
 	if !event.Reason.MayStartNext() {
 		return
 	}
@@ -46,7 +82,7 @@ func (h *Hdlr) OnTrackEnd(p disgolink.Player, event lavalink.TrackEndEvent) {
 	}
 }
 
-func (h *Hdlr) OnTrackException(p disgolink.Player, event lavalink.TrackExceptionEvent) {
+func (h *Handlers) OnTrackException(p disgolink.Player, event lavalink.TrackExceptionEvent) {
 	channelID := h.MusicQueue.ChannelID(p.GuildID())
 	if channelID == 0 {
 		return
@@ -58,7 +94,7 @@ func (h *Hdlr) OnTrackException(p disgolink.Player, event lavalink.TrackExceptio
 	}
 }
 
-func (h *Hdlr) OnTrackStuck(p disgolink.Player, event lavalink.TrackStuckEvent) {
+func (h *Handlers) OnTrackStuck(p disgolink.Player, event lavalink.TrackStuckEvent) {
 	channelID := h.MusicQueue.ChannelID(p.GuildID())
 	if channelID == 0 {
 		return
@@ -70,7 +106,7 @@ func (h *Hdlr) OnTrackStuck(p disgolink.Player, event lavalink.TrackStuckEvent) 
 	}
 }
 
-func (h *Hdlr) OnWebSocketClosed(p disgolink.Player, event lavalink.WebSocketClosedEvent) {
+func (h *Handlers) OnWebSocketClosed(p disgolink.Player, event lavalink.WebSocketClosedEvent) {
 	channelID := h.MusicQueue.ChannelID(p.GuildID())
 	if channelID == 0 {
 		return
@@ -82,10 +118,10 @@ func (h *Hdlr) OnWebSocketClosed(p disgolink.Player, event lavalink.WebSocketClo
 	}
 }
 
-func (h *Hdlr) OnUnknownEvent(p disgolink.Player, event lavalink.UnknownEvent) {
+func (h *Handlers) OnUnknownEvent(p disgolink.Player, event lavalink.UnknownEvent) {
 	log.Infof("unknown event: %s, guild_id: %s, data: %s", event.Type(), event.GuildID(), string(event.Data))
 }
 
-func (h *Hdlr) OnUnknownMessage(p disgolink.Player, event lavalink.UnknownMessage) {
+func (h *Handlers) OnUnknownMessage(p disgolink.Player, event lavalink.UnknownMessage) {
 	log.Infof("unknown message: %s, data: %s", event.Op(), string(event.Data))
 }

@@ -37,7 +37,7 @@ func (c *Commands) Info(e *handler.CommandEvent) error {
 				Fields: append([]discord.EmbedField{
 					{
 						Name:  "Source",
-						Value: "[GitHub](https://github.com/lavalink-devs/lavalionk-bot)",
+						Value: "[GitHub](https://github.com/lavalink-devs/lavalink-bot)",
 					},
 					{
 						Name:  "DisGo",

@@ -35,15 +35,8 @@ var effects = map[EffectType]lavalink.Filters{
 		},
 	},
 	EffectTypeVaporwave: {
-		Equalizer: &lavalink.Equalizer{
-			0: 0.25,
-			1: 0.2,
-			2: 0.2,
-		},
-		Timescale: &lavalink.Timescale{
-			Pitch: 1,
-			Rate:  1,
-			Speed: 0.7,
+			Pitch: 0.8,
+			Speed: 0.80,
 		},
 	},
 	EffectTypePiano: {

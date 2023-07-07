@@ -35,6 +35,7 @@ var effects = map[EffectType]lavalink.Filters{
 		},
 	},
 	EffectTypeVaporwave: {
+		Timescale: &lavalink.Timescale{
 			Pitch: 0.8,
 			Speed: 0.80,
 		},

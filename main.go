@@ -2,12 +2,13 @@ package main
 
 import (
 	"flag"
-	"github.com/disgoorg/disgo/handler/middleware"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/disgoorg/disgo/handler/middleware"
 
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/bot"
@@ -62,23 +63,23 @@ func main() {
 
 			r.Command("/stop", cmds.Stop)
 			r.Command("/disconnect", cmds.Disconnect)
-			//r.Command("/skip", cmds.Skip)
-			//r.Command("/pause", cmds.Pause)
-			//r.Command("/resume", cmds.Resume)
-			//r.Command("/seek", cmds.Seek)
-			//r.Command("/volume", cmds.Volume)
-			//r.Command("/shuffle", cmds.Shuffle)
-			//r.Command("/repeat", cmds.Repeat)
+			r.Command("/skip", cmds.Skip)
+			r.Command("/pause", cmds.Pause)
+			r.Command("/resume", cmds.Resume)
+			// r.Command("/seek", cmds.Seek)
+			// r.Command("/volume", cmds.Volume)
+			// r.Command("/shuffle", cmds.Shuffle)
+			// r.Command("/repeat", cmds.Repeat)
 			r.Command("/queue", cmds.Queue)
-			//r.Command("/now-playing", cmds.NowPlaying)
-			//r.Command("/lyrics", cmds.Lyrics)
-			//r.Command("/remove", cmds.Remove)
-			//r.Command("/move", cmds.Move)
-			//r.Command("/swap", cmds.Swap)
-			//r.Command("/clear", cmds.Clear)
-			//r.Command("/rewind", cmds.Rewind)
-			//r.Command("/forward", cmds.Forward)
-			//r.Command("/restart", cmds.Restart)
+			r.Command("/now-playing", cmds.NowPlaying)
+			// r.Command("/lyrics", cmds.Lyrics)
+			// r.Command("/remove", cmds.Remove)
+			// r.Command("/move", cmds.Move)
+			// r.Command("/swap", cmds.Swap)
+			// r.Command("/clear", cmds.Clear)
+			// r.Command("/rewind", cmds.Rewind)
+			// r.Command("/forward", cmds.Forward)
+			// r.Command("/restart", cmds.Restart)
 			r.Command("/effects", cmds.Effects)
 		})
 	})

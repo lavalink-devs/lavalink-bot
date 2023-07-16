@@ -6,8 +6,8 @@ github.com/cloudflare/circl v1.3.3/go.mod h1:5XYMA4rFBvNIrhs50XuiBJ15vF2pZn4nnUK
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/disgoorg/disgo v0.16.8-0.20230706122238-b331ced0cf92 h1:M2tXhbldmIx80F68Rom8W4VPSUZ46Ul4HT3+1HS/OmY=
 github.com/disgoorg/disgo v0.16.8-0.20230706122238-b331ced0cf92/go.mod h1:wo61ZLPn6bxHVdUODjyZ3fZTnCT7giD3uknsDUwMGn8=
-github.com/disgoorg/disgolink/v3 v3.0.0-20230706003159-13e680d82a24 h1:DCy/zlpIIrXI/bozDYUfZrw7I/LgxQ5FpShtr3dJz10=
-github.com/disgoorg/disgolink/v3 v3.0.0-20230706003159-13e680d82a24/go.mod h1:1QrPGT4dVBeW3HfM0XBdisLSnCiHLG84aXbsFaKWY5w=
+github.com/disgoorg/disgolink/v3 v3.0.0-20230715214421-d02553cbaee0 h1:wGdAKjGCnoe4a8WUhtKPeKYq49L3m9C927Q1PeYsiuA=
+github.com/disgoorg/disgolink/v3 v3.0.0-20230715214421-d02553cbaee0/go.mod h1:1QrPGT4dVBeW3HfM0XBdisLSnCiHLG84aXbsFaKWY5w=
 github.com/disgoorg/json v1.1.0 h1:7xigHvomlVA9PQw9bMGO02PHGJJPqvX5AnwlYg/Tnys=
 github.com/disgoorg/json v1.1.0/go.mod h1:BHDwdde0rpQFDVsRLKhma6Y7fTbQKub/zdGO5O9NqqA=
 github.com/disgoorg/log v1.2.0 h1:sqlXnu/ZKAlIlHV9IO+dbMto7/hCQ474vlIdMWk8QKo=

@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"context"
-	"github.com/disgoorg/disgo/events"
 	"time"
 
 	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/disgolink/v3/lavalink"
 	"github.com/disgoorg/log"
@@ -107,15 +107,7 @@ func (h *Handlers) OnTrackStuck(p disgolink.Player, event lavalink.TrackStuckEve
 }
 
 func (h *Handlers) OnWebSocketClosed(p disgolink.Player, event lavalink.WebSocketClosedEvent) {
-	channelID := h.MusicQueue.ChannelID(p.GuildID())
-	if channelID == 0 {
-		return
-	}
-	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
-		Content: "Websocket closed: " + event.Reason,
-	}); err != nil {
-		h.Client.Logger().Error("failed to send message: ", err)
-	}
+	log.Infof("websocket closed: %s, code: %d, reason: %s", event.GuildID(), event.Code, event.Reason)
 }
 
 func (h *Handlers) OnUnknownEvent(p disgolink.Player, event lavalink.UnknownEvent) {

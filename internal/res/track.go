@@ -15,9 +15,9 @@ func FormatTrack(track lavalink.Track, position lavalink.Duration) string {
 	}
 
 	if track.Info.URI != nil {
-		return fmt.Sprintf("[`%s`](<%s>) - `%s` %s", track.Info.Title, *track.Info.URI, track.Info.Author, positionStr)
+		return fmt.Sprintf("[`%s`](<%s>) - `%s` `%s`", track.Info.Title, *track.Info.URI, track.Info.Author, positionStr)
 	}
-	return fmt.Sprintf("`%s` - `%s` %s`", track.Info.Title, track.Info.Author, positionStr)
+	return fmt.Sprintf("`%s` - `%s` `%s`", track.Info.Title, track.Info.Author, positionStr)
 }
 
 func FormatDuration(duration lavalink.Duration) string {

@@ -101,11 +101,11 @@ func (c *Commands) Effects(e *handler.CommandEvent) error {
 	effectType := EffectType(e.SlashCommandInteractionData().String("effect"))
 	if err := c.Lavalink.ExistingPlayer(*e.GuildID()).Update(context.Background(), lavalink.WithFilters(effects[effectType])); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
-			Content: fmt.Sprintf("failed to appply effect: %s", err),
+			Content: fmt.Sprintf("failed to appply effect: `%s`", err),
 			Flags:   discord.MessageFlagEphemeral,
 		})
 	}
 	return e.CreateMessage(discord.MessageCreate{
-		Content: fmt.Sprintf("applied effect: %s", effectType),
+		Content: fmt.Sprintf("applied effect: `%s`", effectType),
 	})
 }

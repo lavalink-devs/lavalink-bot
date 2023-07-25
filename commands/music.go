@@ -30,6 +30,60 @@ var timeunitChoices = []discord.ApplicationCommandOptionChoiceInt{
 	},
 }
 
+var searchSourceChoices = []discord.ApplicationCommandOptionChoiceString{
+	{
+		Name:  "YouTube",
+		Value: string(lavalink.SearchTypeYouTube),
+	},
+	{
+		Name:  "YouTube Music",
+		Value: string(lavalink.SearchTypeYouTubeMusic),
+	},
+	{
+		Name:  "Deezer",
+		Value: "dzsearch",
+	},
+	{
+		Name:  "Deezer ISRC",
+		Value: "dzisrc",
+	},
+	{
+		Name:  "Spotify",
+		Value: "spsearch",
+	},
+	{
+		Name:  "AppleMusic",
+		Value: "amsearch",
+	},
+	{
+		Name:  "SoundCloud",
+		Value: string(lavalink.SearchTypeSoundCloud),
+	},
+}
+
+var searchTypeChoices = []discord.ApplicationCommandOptionChoiceString{
+	{
+		Name:  "Track",
+		Value: "track",
+	},
+	{
+		Name:  "Album",
+		Value: "album",
+	},
+	{
+		Name:  "Artist",
+		Value: "artist",
+	},
+	{
+		Name:  "Playlist",
+		Value: "playlist",
+	},
+	{
+		Name:  "Text",
+		Value: "text",
+	},
+}
+
 var music = discord.SlashCommandCreate{
 	Name:        "music",
 	Description: "music commands",
@@ -39,44 +93,22 @@ var music = discord.SlashCommandCreate{
 			Description: "Plays a song from a given identifier",
 			Options: []discord.ApplicationCommandOption{
 				discord.ApplicationCommandOptionString{
-					Name:        "identifier",
-					Description: "The identifier to search or play",
-					Required:    true,
+					Name:         "query",
+					Description:  "The query to search or play",
+					Required:     true,
+					Autocomplete: true,
 				},
 				discord.ApplicationCommandOptionString{
 					Name:        "source",
 					Description: "The source to search from",
 					Required:    false,
-					Choices: []discord.ApplicationCommandOptionChoiceString{
-						{
-							Name:  "YouTube",
-							Value: string(lavalink.SearchTypeYouTube),
-						},
-						{
-							Name:  "YouTube Music",
-							Value: string(lavalink.SearchTypeYouTubeMusic),
-						},
-						{
-							Name:  "SoundCloud",
-							Value: string(lavalink.SearchTypeSoundCloud),
-						},
-						{
-							Name:  "Deezer",
-							Value: "dzsearch",
-						},
-						{
-							Name:  "Deezer ISRC",
-							Value: "dzisrc",
-						},
-						{
-							Name:  "Spotify",
-							Value: "spsearch",
-						},
-						{
-							Name:  "AppleMusic",
-							Value: "amsearch",
-						},
-					},
+					Choices:     searchSourceChoices,
+				},
+				discord.ApplicationCommandOptionString{
+					Name:        "type",
+					Description: "The type of the search",
+					Required:    false,
+					Choices:     searchTypeChoices,
 				},
 			},
 		},

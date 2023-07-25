@@ -1,0 +1,36 @@
+package commands
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/handler"
+	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/lavalink-devs/lavalink-bot/internal/res"
+)
+
+func (c *Commands) Seek(e *handler.CommandEvent) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	player := c.Lavalink.ExistingPlayer(*e.GuildID())
+
+	data := e.SlashCommandInteractionData()
+	position := data.Int("position")
+	duration, ok := data.OptInt("time-unit")
+	if !ok {
+		duration = int(time.Second)
+	}
+
+	newPosition := lavalink.Duration(position * duration)
+	if err := player.Update(ctx, lavalink.WithPosition(newPosition)); err != nil {
+		return e.CreateMessage(discord.MessageCreate{
+			Content: "Failed to seek to position",
+		})
+	}
+
+	return e.CreateMessage(discord.MessageCreate{
+		Content: fmt.Sprintf("⏩ Seeked to %s", res.FormatDuration(newPosition)),
+	})
+}

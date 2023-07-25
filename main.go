@@ -67,7 +67,7 @@ func main() {
 			r.Command("/skip", cmds.Skip)
 			r.Command("/pause", cmds.Pause)
 			r.Command("/resume", cmds.Resume)
-			// r.Command("/seek", cmds.Seek)
+			r.Command("/seek", cmds.Seek)
 			// r.Command("/volume", cmds.Volume)
 			// r.Command("/shuffle", cmds.Shuffle)
 			// r.Command("/repeat", cmds.Repeat)

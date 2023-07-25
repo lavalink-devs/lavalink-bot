@@ -8,17 +8,35 @@ import (
 )
 
 func FormatTrack(track lavalink.Track, position lavalink.Duration) string {
-	var positionStr string
+	var lavasrcInfo lavasrc.TrackInfo
+	_ = track.PluginInfo.Unmarshal(&lavasrcInfo)
+
+	positionStr := fmt.Sprintf("`%s`", FormatDuration(track.Info.Length))
 	if position > 0 {
 		positionStr = fmt.Sprintf("`%s/%s`", FormatDuration(position), FormatDuration(track.Info.Length))
-	} else {
-		positionStr = fmt.Sprintf("`%s`", FormatDuration(track.Info.Length))
 	}
 
-	if track.Info.URI != nil {
-		return fmt.Sprintf("[`%s`](<%s>) - `%s` `%s`", track.Info.Title, *track.Info.URI, track.Info.Author, positionStr)
+	trackAuthor := fmt.Sprintf("`%s`", track.Info.Author)
+	if lavasrcInfo.ArtistURL != "" {
+		trackAuthor = fmt.Sprintf("[`%s`](<%s>)", track.Info.Author, lavasrcInfo.ArtistURL)
 	}
-	return fmt.Sprintf("`%s` - `%s` `%s`", track.Info.Title, track.Info.Author, positionStr)
+
+	trackName := fmt.Sprintf("`%s`", track.Info.Title)
+	if track.Info.URI != nil {
+		trackName = fmt.Sprintf("[`%s`](<%s>)", track.Info.Title, *track.Info.URI)
+	}
+
+	var albumName string
+	if lavasrcInfo.AlbumName != "" {
+		albumName = fmt.Sprintf("`%s`", lavasrcInfo.AlbumName)
+		if lavasrcInfo.AlbumURL != "" {
+			albumName = fmt.Sprintf("[`%s`](<%s>)", lavasrcInfo.AlbumName, lavasrcInfo.AlbumURL)
+		}
+
+		return fmt.Sprintf("%s - %s %s - %s", trackName, trackAuthor, positionStr, albumName)
+	}
+
+	return fmt.Sprintf("%s - %s %s", trackName, trackAuthor, positionStr)
 }
 
 func FormatPlaylist(playlist lavalink.Playlist) (string, string) {

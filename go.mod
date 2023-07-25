@@ -7,7 +7,7 @@ require (
 	github.com/disgoorg/disgolink/v3 v3.0.0-20230725012257-d187123dd360
 	github.com/disgoorg/json v1.1.0
 	github.com/disgoorg/lavasearch-plugin v0.0.0-20230724191324-80e186b47b6b
-	github.com/disgoorg/lavasrc-plugin v0.0.0-20230725012636-cce2311b6925
+	github.com/disgoorg/lavasrc-plugin v0.0.0-20230725113728-1a502ffa0952
 	github.com/disgoorg/log v1.2.1
 	github.com/disgoorg/snowflake/v2 v2.0.1
 	github.com/google/go-github/v52 v52.0.0

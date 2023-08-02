@@ -1,6 +1,7 @@
 package lavalinkbot
 
 import (
+	"math/rand"
 	"sync"
 
 	"github.com/disgoorg/disgolink/v3/lavalink"
@@ -75,7 +76,7 @@ func (q *PlayerManager) Add(guildID snowflake.ID, channelID snowflake.ID, tracks
 	qq.tracks = append(qq.tracks, tracks...)
 }
 
-func (q *PlayerManager) Remove(guildID snowflake.ID, index int) {
+func (q *PlayerManager) Remove(guildID snowflake.ID, from int, to int) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
@@ -83,7 +84,12 @@ func (q *PlayerManager) Remove(guildID snowflake.ID, index int) {
 	if !ok {
 		return
 	}
-	qq.tracks = append(qq.tracks[:index], qq.tracks[index+1:]...)
+
+	if to == 0 {
+		to = from + 1
+	}
+
+	qq.tracks = append(qq.tracks[:from], qq.tracks[to:]...)
 }
 
 func (q *PlayerManager) Clear(guildID snowflake.ID) {
@@ -91,6 +97,27 @@ func (q *PlayerManager) Clear(guildID snowflake.ID) {
 	defer q.mu.Unlock()
 
 	delete(q.queues, guildID)
+}
+
+func (q *PlayerManager) Shuffle(guildID snowflake.ID) bool {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+
+	qq, ok := q.queues[guildID]
+	if !ok {
+		return false
+	}
+
+	if len(q.queues[guildID].tracks) >= 1 {
+		return false
+	}
+
+	for i := range qq.tracks {
+		j := i + rand.Intn(len(qq.tracks)-i)
+		qq.tracks[i], qq.tracks[j] = qq.tracks[j], qq.tracks[i]
+	}
+
+	return true
 }
 
 func (q *PlayerManager) SetRepeatMode(guildID snowflake.ID, mode RepeatMode) {

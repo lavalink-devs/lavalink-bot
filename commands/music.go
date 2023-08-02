@@ -5,6 +5,7 @@ import (
 	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/json"
 )
 
 var timeunitChoices = []discord.ApplicationCommandOptionChoiceInt{
@@ -157,6 +158,8 @@ var music = discord.SlashCommandCreate{
 					Name:        "volume",
 					Description: "The volume to set",
 					Required:    true,
+					MinValue:    json.Ptr(0),
+					MaxValue:    json.Ptr(200),
 				},
 			},
 		},

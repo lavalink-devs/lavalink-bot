@@ -11,14 +11,22 @@ func FormatTrack(track lavalink.Track, position lavalink.Duration) string {
 	var lavasrcInfo lavasrc.TrackInfo
 	_ = track.PluginInfo.Unmarshal(&lavasrcInfo)
 
-	positionStr := fmt.Sprintf("`%s`", FormatDuration(track.Info.Length))
-	if position > 0 {
+	var positionStr string
+	if track.Info.IsStream {
+		positionStr = "`LIVE`"
+	} else if position > 0 {
 		positionStr = fmt.Sprintf("`%s/%s`", FormatDuration(position), FormatDuration(track.Info.Length))
+	} else {
+		positionStr = fmt.Sprintf("`%s`", FormatDuration(track.Info.Length))
 	}
 
-	trackAuthor := fmt.Sprintf("`%s`", track.Info.Author)
-	if lavasrcInfo.ArtistURL != "" {
-		trackAuthor = fmt.Sprintf("[`%s`](<%s>)", track.Info.Author, lavasrcInfo.ArtistURL)
+	var trackAuthor string
+	if track.Info.Author != "Unknown Author" {
+		if lavasrcInfo.ArtistURL != "" {
+			trackAuthor = fmt.Sprintf("[`%s`](<%s>)", track.Info.Author, lavasrcInfo.ArtistURL)
+		} else {
+			trackAuthor = fmt.Sprintf("`%s`", track.Info.Author)
+		}
 	}
 
 	trackName := fmt.Sprintf("`%s`", track.Info.Title)

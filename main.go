@@ -51,7 +51,8 @@ func main() {
 	cmds := &commands.Commands{Bot: b}
 	r := handler.New()
 	r.Use(middleware.Go)
-	r.Command("/info", cmds.Info)
+	r.Command("/info/bot", cmds.InfoBot)
+	r.Command("/info/lavalink", cmds.InfoLavalink)
 	r.Command("/latest", cmds.Latest)
 	r.Autocomplete("/latest", cmds.LatestAutocomplete)
 	r.Command("/decode", cmds.Decode)

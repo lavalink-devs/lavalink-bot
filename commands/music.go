@@ -111,6 +111,11 @@ var music = discord.SlashCommandCreate{
 					Required:    false,
 					Choices:     searchTypeChoices,
 				},
+				discord.ApplicationCommandOptionBool{
+					Name:        "raw",
+					Description: "Whether to not do any transformation on the query",
+					Required:    false,
+				},
 			},
 		},
 		discord.ApplicationCommandOptionSubCommand{

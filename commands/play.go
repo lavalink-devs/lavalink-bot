@@ -32,7 +32,9 @@ func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 	if source == "" {
 		source = "dzsearch"
 	}
-	query = source.Apply(query)
+	if !e.Data.Bool("raw") {
+		query = source.Apply(query)
+	}
 
 	var types []lavasearch.SearchType
 	if searchType, ok := e.Data.OptString("type"); ok {
@@ -140,11 +142,13 @@ func (c *Commands) Play(e *handler.CommandEvent) error {
 
 	query := data.String("query")
 
-	if !urlPattern.MatchString(query) && !queryPattern.MatchString(query) {
-		if source, ok := data.OptString("source"); ok {
-			query = lavalink.SearchType(source).Apply(query)
-		} else {
-			query = lavalink.SearchType("dzsearch").Apply(query)
+	if !data.Bool("raw") {
+		if !urlPattern.MatchString(query) && !queryPattern.MatchString(query) {
+			if source, ok := data.OptString("source"); ok {
+				query = lavalink.SearchType(source).Apply(query)
+			} else {
+				query = lavalink.SearchType("dzsearch").Apply(query)
+			}
 		}
 	}
 

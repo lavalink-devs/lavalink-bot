@@ -119,6 +119,68 @@ var music = discord.SlashCommandCreate{
 			},
 		},
 		discord.ApplicationCommandOptionSubCommand{
+			Name:        "tts",
+			Description: "Crafts a text-to-speech link to play",
+			Options: []discord.ApplicationCommandOption{
+				discord.ApplicationCommandOptionString{
+					Name:        "message",
+					Description: "The message to play",
+					Required:    true,
+				},
+				discord.ApplicationCommandOptionString{
+					Name:        "voice",
+					Description: "The voice to use for the message",
+					Required:    false,
+				},
+				discord.ApplicationCommandOptionBool{
+					Name:        "translate",
+					Description: "Whether to translate the message to english",
+					Required:    false,
+				},
+				discord.ApplicationCommandOptionFloat{
+					Name:        "silence",
+					Description: "The silence to add before the message",
+					Required:    false,
+				},
+				discord.ApplicationCommandOptionFloat{
+					Name:        "speed",
+					Description: "The speed of the message",
+					Required:    false,
+				},
+				discord.ApplicationCommandOptionString{
+					Name:        "audio-format",
+					Description: "The audio format of the message",
+					Required:    false,
+					Choices: []discord.ApplicationCommandOptionChoiceString{
+						{
+							Name:  "MP3",
+							Value: "mp3",
+						},
+						{
+							Name:  "OGG Opus",
+							Value: "ogg_opus",
+						},
+						{
+							Name:  "OGG Vorbis",
+							Value: "ogg_vorbis",
+						},
+						{
+							Name:  "WAV",
+							Value: "wav",
+						},
+						{
+							Name:  "FLAC",
+							Value: "flac",
+						},
+						{
+							Name:  "AAC",
+							Value: "aac",
+						},
+					},
+				},
+			},
+		},
+		discord.ApplicationCommandOptionSubCommand{
 			Name:        "stop",
 			Description: "Stops the current track",
 		},

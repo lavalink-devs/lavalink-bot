@@ -59,6 +59,7 @@ func main() {
 
 	r.Route("/music", func(r handler.Router) {
 		r.Command("/play", cmds.Play)
+		r.Command("/tts", cmds.TTS)
 		r.Autocomplete("/play", cmds.PlayAutocomplete)
 		r.Group(func(r handler.Router) {
 			r.Use(cmds.RequirePlayer)

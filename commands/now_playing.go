@@ -5,6 +5,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
+	"github.com/disgoorg/json"
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 
@@ -17,8 +18,21 @@ func (c *Commands) NowPlaying(e *handler.CommandEvent) error {
 			Flags:   discord.MessageFlagEphemeral,
 		})
 	}
+	content := fmt.Sprintf("Now playing: %s", res.FormatTrack(*track, player.Position()))
+
+	if e.SlashCommandInteractionData().Bool("raw") {
+		data, err := json.MarshalIndent(track, "", "  ")
+		if err != nil {
+			return e.CreateMessage(discord.MessageCreate{
+				Content: fmt.Sprintf("Failed to marshal track: %s", err),
+				Flags:   discord.MessageFlagEphemeral,
+			})
+		}
+
+		content += fmt.Sprintf("\n```json\n%s\n```", data)
+	}
 
 	return e.CreateMessage(discord.MessageCreate{
-		Content: fmt.Sprintf("Now playing: %s", res.FormatTrack(*track, player.Position())),
+		Content: content,
 	})
 }

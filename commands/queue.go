@@ -18,7 +18,12 @@ func (c *Commands) Queue(e *handler.CommandEvent) error {
 
 	content := fmt.Sprintf("**Queue(%d):**\n", len(tracks))
 	for i, track := range tracks {
-		content += fmt.Sprintf("%d. %s\n", i+1, res.FormatTrack(track, 0))
+		line := fmt.Sprintf("%d. %s\n", i+1, res.FormatTrack(track, 0))
+		if len(content)+len(line) > 1980 {
+			content += fmt.Sprintf("... and %d more", len(tracks)-i)
+			break
+		}
+		content += line
 	}
 
 	return e.CreateMessage(discord.MessageCreate{

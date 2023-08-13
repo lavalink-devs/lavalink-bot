@@ -13,6 +13,8 @@ import (
 	"github.com/disgoorg/disgolink/v3/lavalink"
 	"github.com/disgoorg/json"
 	"github.com/disgoorg/lavasearch-plugin"
+	"github.com/disgoorg/lavasrc-plugin"
+	"github.com/disgoorg/log"
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 	"go.deanishe.net/fuzzy"
 )
@@ -59,36 +61,53 @@ func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 		if len(choices) >= 5 {
 			break
 		}
+		log.Info(album.PluginInfo)
+
+		var albumInfo lavasrc.PlaylistInfo
+		_ = album.PluginInfo.Unmarshal(&albumInfo)
+
 		choices = append(choices, discord.AutocompleteChoiceString{
-			Name:  res.Trim("💿 "+album.Name+" - "+album.Artist, 100),
-			Value: album.URL,
+			Name:  res.Trim("💿 "+album.Info.Name+" - "+albumInfo.Author, 100),
+			Value: albumInfo.URL,
 		})
 	}
 	for _, artist := range result.Artists {
 		if len(choices) >= 10 {
 			break
 		}
+
+		var artistInfo lavasrc.PlaylistInfo
+		_ = artist.PluginInfo.Unmarshal(&artistInfo)
+
 		choices = append(choices, discord.AutocompleteChoiceString{
-			Name:  res.Trim("🧑 "+artist.Name, 100),
-			Value: artist.URL,
+			Name:  res.Trim("🧑 "+artistInfo.Author, 100),
+			Value: artistInfo.URL,
 		})
 	}
 	for _, playlist := range result.Playlists {
 		if len(choices) >= 15 {
 			break
 		}
+
+		var playlistInfo lavasrc.PlaylistInfo
+		_ = playlist.PluginInfo.Unmarshal(&playlistInfo)
+
 		choices = append(choices, discord.AutocompleteChoiceString{
-			Name:  res.Trim("📜 "+playlist.Name, 100),
-			Value: playlist.URL,
+			Name:  res.Trim("📜 "+playlist.Info.Name, 100),
+			Value: playlistInfo.URL,
 		})
 	}
 	for _, track := range result.Tracks {
 		if len(choices) >= 20 {
 			break
 		}
+
+		var trackInfo lavasrc.PlaylistInfo
+		_ = track.PluginInfo.Unmarshal(&trackInfo)
+
 		choices = append(choices, discord.AutocompleteChoiceString{
-			Name:  res.Trim("🎶 "+track.Title+" - "+track.Author, 100),
-			Value: track.URI,
+			Name:  res.Trim("🎶 "+track.Info.Title+" - "+track.Info.Author, 100),
+			Value: *track.Info.URI,
 		})
 	}
 	for _, text := range result.Texts {

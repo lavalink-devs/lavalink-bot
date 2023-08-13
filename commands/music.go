@@ -266,6 +266,13 @@ var music = discord.SlashCommandCreate{
 		discord.ApplicationCommandOptionSubCommand{
 			Name:        "now-playing",
 			Description: "Shows the current track",
+			Options: []discord.ApplicationCommandOption{
+				discord.ApplicationCommandOptionBool{
+					Name:        "raw",
+					Description: "Whether to include the raw track & info",
+					Required:    false,
+				},
+			},
 		},
 		discord.ApplicationCommandOptionSubCommand{
 			Name:        "lyrics",

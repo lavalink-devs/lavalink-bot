@@ -85,6 +85,41 @@ var searchTypeChoices = []discord.ApplicationCommandOptionChoiceString{
 	},
 }
 
+var sponsorblockOptions = []discord.ApplicationCommandOption{
+	discord.ApplicationCommandOptionBool{
+		Name:        "sponsor",
+		Description: "Whether to skip sponsor segments",
+	},
+	discord.ApplicationCommandOptionBool{
+		Name:        "selfpromo",
+		Description: "Whether to skip selfpromo segments",
+	},
+	discord.ApplicationCommandOptionBool{
+		Name:        "interaction",
+		Description: "Whether to skip interaction segments",
+	},
+	discord.ApplicationCommandOptionBool{
+		Name:        "intro",
+		Description: "Whether to skip intro segments",
+	},
+	discord.ApplicationCommandOptionBool{
+		Name:        "outro",
+		Description: "Whether to skip outro segments",
+	},
+	discord.ApplicationCommandOptionBool{
+		Name:        "preview",
+		Description: "Whether to skip preview segments",
+	},
+	discord.ApplicationCommandOptionBool{
+		Name:        "music_offtopic",
+		Description: "Whether to skip music_offtopic segments",
+	},
+	discord.ApplicationCommandOptionBool{
+		Name:        "filler",
+		Description: "Whether to skip filler segments",
+	},
+}
+
 var music = discord.SlashCommandCreate{
 	Name:        "music",
 	Description: "music commands",
@@ -402,6 +437,21 @@ var music = discord.SlashCommandCreate{
 							Value: string(EffectTypeBassBoost),
 						},
 					},
+				},
+			},
+		},
+		discord.ApplicationCommandOptionSubCommandGroup{
+			Name:        "sponsorblock",
+			Description: "Shows or sets the skipping sponsorblock categories",
+			Options: []discord.ApplicationCommandOptionSubCommand{
+				{
+					Name:        "show",
+					Description: "Shows the current skipping sponsorblock categories",
+				},
+				{
+					Name:        "set",
+					Description: "Sets the skipping sponsorblock categories",
+					Options:     sponsorblockOptions,
 				},
 			},
 		},

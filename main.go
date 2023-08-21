@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/disgoorg/disgo/handler/middleware"
+	"github.com/disgoorg/sponsorblock-plugin"
 
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/bot"
@@ -84,6 +85,8 @@ func main() {
 			// r.Command("/forward", cmds.Forward)
 			// r.Command("/restart", cmds.Restart)
 			r.Command("/effects", cmds.Effects)
+			r.Command("/sponsorblock/show", cmds.ShowSponsorblock)
+			r.Command("/sponsorblock/set", cmds.SetSponsorblock)
 		})
 	})
 
@@ -107,13 +110,19 @@ func main() {
 		log.Errorf("failed to sync commands: %s", err)
 	}
 
+	sponsorblockPlugin := sponsorblock.New()
 	if b.Lavalink = disgolink.New(b.Client.ApplicationID(),
+		disgolink.WithPlugins(sponsorblockPlugin),
 		disgolink.WithListenerFunc(hdlr.OnTrackStart),
 		disgolink.WithListenerFunc(hdlr.OnTrackEnd),
 		disgolink.WithListenerFunc(hdlr.OnTrackException),
 		disgolink.WithListenerFunc(hdlr.OnTrackStuck),
 		disgolink.WithListenerFunc(hdlr.OnWebSocketClosed),
 		disgolink.WithListenerFunc(hdlr.OnUnknownEvent),
+		disgolink.WithListenerFunc(hdlr.OnSegmentsLoaded),
+		disgolink.WithListenerFunc(hdlr.OndSegmentSkipped),
+		disgolink.WithListenerFunc(hdlr.OnChaptersLoaded),
+		disgolink.WithListenerFunc(hdlr.OnChapterStarted),
 	); err != nil {
 		log.Fatal("failed to create disgolink client: ", err)
 	}

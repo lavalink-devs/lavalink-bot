@@ -18,9 +18,9 @@ func (c *Commands) Seek(e *handler.CommandEvent) error {
 
 	data := e.SlashCommandInteractionData()
 	position := data.Int("position")
-	duration, ok := data.OptInt("time-unit")
+	duration, ok := data.OptInt("unit")
 	if !ok {
-		duration = int(time.Second)
+		duration = int(lavalink.Second)
 	}
 
 	newPosition := lavalink.Duration(position * duration)

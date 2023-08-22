@@ -10,6 +10,7 @@ import (
 
 	"github.com/disgoorg/disgo/handler/middleware"
 	"github.com/disgoorg/sponsorblock-plugin"
+	"github.com/lavalink-devs/lavalink-bot/internal/maven"
 
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/bot"
@@ -43,9 +44,9 @@ func main() {
 	b := &lavalinkbot.Bot{
 		Cfg:    cfg,
 		GitHub: github.NewClient(nil),
-		HTTPClient: &http.Client{
+		Maven: maven.New(&http.Client{
 			Timeout: 10 * time.Second,
-		},
+		}),
 		MusicQueue: lavalinkbot.NewPlayerManager(),
 	}
 

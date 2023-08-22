@@ -1,23 +1,80 @@
 package maven
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 )
 
-const TimeFormat = "20060102150405"
+const (
+	TimeFormat = "20060102150405"
+	CacheTTL   = time.Minute * 5
+)
 
-func FetchLatestVersion(client *http.Client, dependency string, repository string) (*Metadata, error) {
+func New(client *http.Client) *Maven {
+	ctx, cancel := context.WithCancel(context.Background())
+	m := &Maven{
+		client: client,
+		cancel: cancel,
+		cache:  make(map[string]*Metadata),
+	}
+
+	go m.cleanupCache(ctx)
+
+	return m
+}
+
+type Maven struct {
+	client *http.Client
+	cancel context.CancelFunc
+
+	cacheMu sync.Mutex
+	cache   map[string]*Metadata
+}
+
+func (m *Maven) Close() {
+	m.client.CloseIdleConnections()
+	m.cancel()
+}
+
+func (m *Maven) cleanupCache(ctx context.Context) {
+	t := time.NewTicker(time.Minute)
+	defer t.Stop()
+
+	for {
+		select {
+		case <-t.C:
+			m.cacheMu.Lock()
+			for k, v := range m.cache {
+				if time.Since(v.FetchedAt) > CacheTTL {
+					delete(m.cache, k)
+				}
+			}
+			m.cacheMu.Unlock()
+		case <-ctx.Done():
+			return
+		}
+	}
+}
+
+func (m *Maven) FetchLatestVersion(dependency string, repository string) (*Metadata, error) {
+	m.cacheMu.Lock()
+	defer m.cacheMu.Unlock()
+	if metadata, ok := m.cache[dependency]; ok {
+		return metadata, nil
+	}
+
 	split := strings.Split(dependency, ":")
 	if len(split) < 2 {
 		return nil, fmt.Errorf("invalid dependency: %s", dependency)
 	}
 	url := fmt.Sprintf("%s/%s/%s/maven-metadata.xml", repository, strings.ReplaceAll(split[0], ".", "/"), split[1])
-	rs, err := client.Get(url)
+	rs, err := m.client.Get(url)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get maven-metadata.xml: %w", err)
 	}
@@ -34,6 +91,8 @@ func FetchLatestVersion(client *http.Client, dependency string, repository strin
 	if err = decoder.Decode(&metadata); err != nil {
 		return nil, fmt.Errorf("failed to decode maven-metadata.xml: %w", err)
 	}
+	metadata.FetchedAt = time.Now()
+	m.cache[dependency] = &metadata
 	return &metadata, nil
 }
 
@@ -41,6 +100,7 @@ type Metadata struct {
 	GroupID    string     `xml:"groupId"`
 	ArtifactID string     `xml:"artifactId"`
 	Versioning Versioning `xml:"versioning"`
+	FetchedAt  time.Time  `xml:"-"`
 }
 
 func (m Metadata) Latest() string {

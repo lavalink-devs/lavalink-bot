@@ -2,21 +2,21 @@ package lavalinkbot
 
 import (
 	"context"
-	"net/http"
 	"time"
 
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/log"
 	"github.com/google/go-github/v52/github"
+	"github.com/lavalink-devs/lavalink-bot/internal/maven"
 )
 
 type Bot struct {
 	Cfg        Config
 	Client     bot.Client
+	Maven      *maven.Maven
 	Lavalink   disgolink.Client
 	GitHub     *github.Client
-	HTTPClient *http.Client
 	MusicQueue *PlayerManager
 }
 
@@ -40,7 +40,7 @@ func (b *Bot) Start() error {
 func (b *Bot) Stop() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	b.HTTPClient.CloseIdleConnections()
+	b.Maven.Close()
 	b.Lavalink.Close()
 	b.Client.Close(ctx)
 }

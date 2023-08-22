@@ -6,7 +6,6 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/lavalink-devs/lavalink-bot/internal/maven"
 	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 )
@@ -53,49 +52,42 @@ func (c *Commands) Latest(e *handler.CommandEvent) error {
 
 	latestType, ok := e.SlashCommandInteractionData().OptString("type")
 	if !ok {
-		embed, err := getLatestEmbed(c, "lavalink")
-		if err != nil {
-			return err
-		}
+		embed := getLatestEmbed(c, "lavalink")
 		for _, plugin := range c.Cfg.Plugins {
-			newEmbed, err := getLatestEmbed(c, plugin.Dependency)
-			if err != nil {
-				return err
-			}
+			newEmbed := getLatestEmbed(c, plugin.Dependency)
 			embed.Fields = append(embed.Fields, discord.EmbedField{
 				Name:  newEmbed.Title,
 				Value: newEmbed.Description,
 			})
 		}
 
-		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
-			Embeds: &[]discord.Embed{*embed},
+		_, err := e.UpdateInteractionResponse(discord.MessageUpdate{
+			Embeds: &[]discord.Embed{embed},
 		})
 		return err
 	}
-	embed, err := getLatestEmbed(c, latestType)
-	if err != nil {
-		return err
-	}
-	_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
-		Embeds: &[]discord.Embed{*embed},
+	embed := getLatestEmbed(c, latestType)
+	_, err := e.UpdateInteractionResponse(discord.MessageUpdate{
+		Embeds: &[]discord.Embed{embed},
 	})
 	return err
 }
 
-func getLatestEmbed(c *Commands, latestType string) (*discord.Embed, error) {
+func getLatestEmbed(c *Commands, latestType string) discord.Embed {
 	if latestType == "lavalink" {
-		release, _, err := c.GitHub.Repositories.GetLatestRelease(context.Background(), "lavalink-devs", "Lavalink")
-		if err != nil {
-			return nil, err
-		}
-		return &discord.Embed{
+		embed := discord.Embed{
 			Author: &discord.EmbedAuthor{
 				Name: "Latest Lavalink Version",
-				URL:  release.GetHTMLURL(),
 			},
-			Description: fmt.Sprintf("**Version:** `%s`\n**Release Date:** %s", release.GetTagName(), discord.NewTimestamp(discord.TimestampStyleLongDateTime, release.GetPublishedAt().Time)),
-		}, nil
+		}
+		release, _, err := c.GitHub.Repositories.GetLatestRelease(context.Background(), "lavalink-devs", "Lavalink")
+		if err != nil {
+			embed.Description = "Failed to get latest Lavalink version: " + err.Error()
+			return embed
+		}
+		embed.Author.URL = release.GetHTMLURL()
+		embed.Description = fmt.Sprintf("**Version:** `%s`\n**Release Date:** %s", release.GetTagName(), discord.NewTimestamp(discord.TimestampStyleLongDateTime, release.GetPublishedAt().Time))
+		return embed
 	}
 	var pluginCfg lavalinkbot.PluginConfig
 	for _, plugin := range c.Cfg.Plugins {
@@ -105,16 +97,20 @@ func getLatestEmbed(c *Commands, latestType string) (*discord.Embed, error) {
 		}
 	}
 	if pluginCfg.Dependency == "" {
-		return nil, fmt.Errorf("plugin %s not found", latestType)
+		return discord.Embed{
+			Description: fmt.Sprintf("Unknown plugin: `%s`", latestType),
+		}
 	}
 
-	metadata, err := maven.FetchLatestVersion(c.HTTPClient, pluginCfg.Dependency, pluginCfg.Repository)
+	metadata, err := c.Maven.FetchLatestVersion(pluginCfg.Dependency, pluginCfg.Repository)
 	if err != nil {
-		return nil, err
+		return discord.Embed{
+			Description: fmt.Sprintf("Failed to get latest %s version: %s", pluginCfg.Dependency, err.Error()),
+		}
 	}
-	return &discord.Embed{
+	return discord.Embed{
 		Title:       fmt.Sprintf("Latest %s Version", metadata.ArtifactID),
 		Description: fmt.Sprintf("**Version:** `%s`", metadata.Latest()),
-	}, nil
+	}
 
 }

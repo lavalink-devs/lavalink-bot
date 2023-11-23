@@ -14,7 +14,6 @@ import (
 	"github.com/disgoorg/json"
 	"github.com/disgoorg/lavasearch-plugin"
 	"github.com/disgoorg/lavasrc-plugin"
-	"github.com/disgoorg/log"
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 	"go.deanishe.net/fuzzy"
 )
@@ -27,7 +26,7 @@ var (
 func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 	query := e.Data.String("query")
 	if query == "" {
-		return e.Result(nil)
+		return e.AutocompleteResult(nil)
 	}
 
 	source := lavalink.SearchType(e.Data.String("source"))
@@ -46,9 +45,9 @@ func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 	result, err := lavasearch.LoadSearch(c.Lavalink.BestNode().Rest(), query, types)
 	if err != nil {
 		if errors.Is(err, lavasearch.ErrEmptySearchResult) {
-			return e.Result(nil)
+			return e.AutocompleteResult(nil)
 		}
-		return e.Result([]discord.AutocompleteChoice{
+		return e.AutocompleteResult([]discord.AutocompleteChoice{
 			discord.AutocompleteChoiceString{
 				Name:  res.Trim("Failed to load search results: "+err.Error(), 100),
 				Value: "error",
@@ -61,7 +60,6 @@ func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 		if len(choices) >= 5 {
 			break
 		}
-		log.Info(album.PluginInfo)
 
 		var albumInfo lavasrc.PlaylistInfo
 		_ = album.PluginInfo.Unmarshal(&albumInfo)
@@ -122,7 +120,7 @@ func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 
 	fuzzy.Sort(Choices(choices), e.Data.String("query"))
 
-	return e.Result(choices)
+	return e.AutocompleteResult(choices)
 }
 
 var (

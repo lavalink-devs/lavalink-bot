@@ -3,15 +3,16 @@ package handlers
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/disgolink/v3/lavalink"
-	"github.com/disgoorg/log"
 	"github.com/disgoorg/sponsorblock-plugin"
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
+	"github.com/topi314/tint"
 )
 
 func (h *Handlers) OnVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {
@@ -30,7 +31,7 @@ func (h *Handlers) OnVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 			if err := h.Client.UpdateVoiceState(ctx, event.VoiceState.GuildID, nil, false, false); err != nil {
-				log.Errorf("failed to disconnect from voice channel: %s", err)
+				slog.Error("failed to disconnect from voice channel", tint.Err(err))
 			}
 		}
 		return
@@ -57,7 +58,7 @@ func (h *Handlers) OnTrackStart(p disgolink.Player, event lavalink.TrackStartEve
 	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
 		Content: "Now playing: " + res.FormatTrack(event.Track, 0),
 	}); err != nil {
-		h.Client.Logger().Error("failed to send message: ", err)
+		slog.Error("failed to send message", tint.Err(err))
 	}
 }
 
@@ -79,7 +80,7 @@ func (h *Handlers) OnTrackEnd(p disgolink.Player, event lavalink.TrackEndEvent) 
 		if _, err = h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
 			Content: "failed to start next track: " + err.Error(),
 		}); err != nil {
-			h.Client.Logger().Error("failed to send message: ", err)
+			slog.Error("failed to send message", tint.Err(err))
 		}
 	}
 }
@@ -92,7 +93,7 @@ func (h *Handlers) OnTrackException(p disgolink.Player, event lavalink.TrackExce
 	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
 		Content: "Track exception: " + event.Exception.Error(),
 	}); err != nil {
-		h.Client.Logger().Error("failed to send message: ", err)
+		slog.Error("failed to send message", tint.Err(err))
 	}
 }
 
@@ -104,20 +105,21 @@ func (h *Handlers) OnTrackStuck(p disgolink.Player, event lavalink.TrackStuckEve
 	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
 		Content: "Track stuck: " + event.Track.Info.Title,
 	}); err != nil {
-		h.Client.Logger().Error("failed to send message: ", err)
+		slog.Error("failed to send message", tint.Err(err))
 	}
 }
 
 func (h *Handlers) OnWebSocketClosed(p disgolink.Player, event lavalink.WebSocketClosedEvent) {
-	log.Infof("websocket closed: %s, code: %d, reason: %s", event.GuildID(), event.Code, event.Reason)
+	slog.Info("websocket closed: %s, code: %d, reason: %s", event.GuildID(), event.Code, event.Reason)
+	slog.Info("websocket closed", slog.Int64("guild_id", int64(event.GuildID())), slog.Int("code", event.Code), slog.String("reason", event.Reason))
 }
 
 func (h *Handlers) OnUnknownEvent(p disgolink.Player, event lavalink.UnknownEvent) {
-	log.Infof("unknown event: %s, guild_id: %s, data: %s", event.Type(), event.GuildID(), string(event.Data))
+	slog.Info("unknown event", slog.String("event", string(event.Type())), slog.Int64("guild_id", int64(event.GuildID())), slog.String("data", string(event.Data)))
 }
 
 func (h *Handlers) OnUnknownMessage(p disgolink.Player, event lavalink.UnknownMessage) {
-	log.Infof("unknown message: %s, data: %s", event.Op(), string(event.Data))
+	slog.Info("unknown message", slog.String("op", string(event.Op())), slog.String("data", string(event.Data)))
 }
 
 func (h *Handlers) OnSegmentsLoaded(p disgolink.Player, event sponsorblock.SegmentsLoadedEvent) {
@@ -138,7 +140,7 @@ func (h *Handlers) OnSegmentsLoaded(p disgolink.Player, event sponsorblock.Segme
 	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
 		Content: content,
 	}); err != nil {
-		h.Client.Logger().Error("failed to send message: ", err)
+		slog.Error("failed to send message", tint.Err(err))
 	}
 }
 
@@ -150,7 +152,7 @@ func (h *Handlers) OndSegmentSkipped(p disgolink.Player, event sponsorblock.Segm
 	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
 		Content: fmt.Sprintf("Segment skipped: %s: %s - %s", event.Segment.Category, res.FormatDuration(event.Segment.Start), res.FormatDuration(event.Segment.End)),
 	}); err != nil {
-		h.Client.Logger().Error("failed to send message: ", err)
+		slog.Error("failed to send message", tint.Err(err))
 	}
 }
 
@@ -172,7 +174,7 @@ func (h *Handlers) OnChaptersLoaded(p disgolink.Player, event sponsorblock.Chapt
 	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
 		Content: content,
 	}); err != nil {
-		h.Client.Logger().Error("failed to send message: ", err)
+		slog.Error("failed to send message", tint.Err(err))
 	}
 }
 
@@ -184,6 +186,6 @@ func (h *Handlers) OnChapterStarted(p disgolink.Player, event sponsorblock.Chapt
 	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
 		Content: fmt.Sprintf("Chapter started: %s: %s - %s", event.Chapter.Name, res.FormatDuration(event.Chapter.Start), res.FormatDuration(event.Chapter.End)),
 	}); err != nil {
-		h.Client.Logger().Error("failed to send message: ", err)
+		slog.Error("failed to send message", tint.Err(err))
 	}
 }

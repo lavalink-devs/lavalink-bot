@@ -2,14 +2,15 @@ package lavalinkbot
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgolink/v3/disgolink"
-	"github.com/disgoorg/log"
 	"github.com/google/go-github/v52/github"
+	"github.com/topi314/tint"
 
 	"github.com/lavalink-devs/lavalink-bot/internal/maven"
 )
@@ -36,16 +37,16 @@ func (b *Bot) Start() error {
 		go func(node NodeConfig) {
 			defer wg.Done()
 			if _, err := b.Lavalink.AddNode(ctx, node.ToNodeConfig()); err != nil {
-				log.Errorf("failed to add lavalink node %s: %s", node.Name, err)
+				slog.Error("failed to add lavalink node", slog.String("node", node.Name), tint.Err(err))
 			} else {
-				log.Infof("added lavalink node: %s", node.Name)
+				slog.Info("added lavalink node", slog.String("node", node.Name))
 			}
 		}(b.Cfg.Nodes[i])
 	}
 
 	wg.Wait()
 	if node := b.Lavalink.BestNode(); node == nil {
-		log.Error("no node connected")
+		slog.Error("no node connected")
 		os.Exit(-1)
 	}
 

@@ -42,7 +42,7 @@ func (c *Commands) LatestAutocomplete(e *handler.AutocompleteEvent) error {
 		})
 	}
 
-	return e.Result(choices)
+	return e.AutocompleteResult(choices)
 }
 
 func (c *Commands) Latest(e *handler.CommandEvent) error {

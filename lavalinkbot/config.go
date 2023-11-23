@@ -2,19 +2,19 @@ package lavalinkbot
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"strings"
 
 	"github.com/disgoorg/disgolink/v3/disgolink"
-	"github.com/disgoorg/log"
 	"github.com/disgoorg/snowflake/v2"
 	"gopkg.in/yaml.v3"
 )
 
 var defaultConfig = Config{
 	Log: LogConfig{
-		Level:     log.LevelInfo,
-		AddSource: false,
+		Level:  slog.LevelInfo,
+		Format: "text",
 	},
 }
 
@@ -49,23 +49,19 @@ func (c Config) String() string {
 }
 
 type LogConfig struct {
-	Level     log.Level `yaml:"level"`
-	AddSource bool      `yaml:"add_source"`
+	Level     slog.Level `yaml:"level"`
+	Format    string     `yaml:"format"`
+	AddSource bool       `yaml:"add_source"`
+	NoColor   bool       `yaml:"no_color"`
 }
 
 func (c LogConfig) String() string {
-	return fmt.Sprintf("\n  Level: %s\n  AddSource: %t\n",
+	return fmt.Sprintf("\n  Level: %s\n  Format: %s\n  AddSource: %t\n  NoColor: %t\n",
 		c.Level,
+		c.Format,
 		c.AddSource,
+		c.NoColor,
 	)
-}
-
-func (c LogConfig) Flags() int {
-	flags := log.LstdFlags
-	if c.AddSource {
-		flags |= log.Llongfile
-	}
-	return flags
 }
 
 type BotConfig struct {

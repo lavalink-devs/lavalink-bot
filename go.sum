@@ -9,8 +9,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/disgoorg/disgo v0.17.0 h1:/LcgXgPDhzHt3GkQ4cpjmIJBim1/VYfS31VhGYif3Ms=
 github.com/disgoorg/disgo v0.17.0/go.mod h1:AE2J/8oLR2PtYfqcARsk1mgBxQ5z3Z1OD6Lc2SA0gak=
-github.com/disgoorg/disgolink/v3 v3.0.0-20231123221557-7482a52d013a h1:Q4rsO+hwjRYELK0X43fUft02BJBN3nleVImxNxzUnjM=
-github.com/disgoorg/disgolink/v3 v3.0.0-20231123221557-7482a52d013a/go.mod h1:YIwjIteZcjfI7HYZWH241iRI7RjTLoN51HLDOUHVSFI=
+github.com/disgoorg/disgolink/v3 v3.0.0-20231126174358-f0db0ed57f17 h1:UqxupfVPqaiMWGr7xVrQmmrZCG2Y/9sosqkCDWyo9VU=
+github.com/disgoorg/disgolink/v3 v3.0.0-20231126174358-f0db0ed57f17/go.mod h1:YIwjIteZcjfI7HYZWH241iRI7RjTLoN51HLDOUHVSFI=
 github.com/disgoorg/json v1.1.0 h1:7xigHvomlVA9PQw9bMGO02PHGJJPqvX5AnwlYg/Tnys=
 github.com/disgoorg/json v1.1.0/go.mod h1:BHDwdde0rpQFDVsRLKhma6Y7fTbQKub/zdGO5O9NqqA=
 github.com/disgoorg/lavasearch-plugin v0.0.0-20230812211104-12547850ae07 h1:hf3vNsBK1gp1TEqonO3YYG8NxJswbLe6BusUalMnYfg=

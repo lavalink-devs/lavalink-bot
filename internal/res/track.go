@@ -40,7 +40,6 @@ func FormatTrack(track lavalink.Track, position lavalink.Duration) string {
 		if lavasrcInfo.AlbumURL != "" {
 			albumName = fmt.Sprintf("[`%s`](<%s>)", lavasrcInfo.AlbumName, lavasrcInfo.AlbumURL)
 		}
-
 		return fmt.Sprintf("%s - %s %s - %s", trackName, trackAuthor, positionStr, albumName)
 	}
 

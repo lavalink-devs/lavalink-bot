@@ -23,8 +23,8 @@ func FormatPlaylist(playlist lavalink.Playlist) (string, string) {
 		name = lavasrcInfo.Author + " - " + name
 	}
 	if lavasrcInfo.URL != "" {
-		return playlistType, fmt.Sprintf("[`%s`](<%s>) - `%d tracks`", name, lavasrcInfo.URL, len(playlist.Tracks))
+		return playlistType, fmt.Sprintf("[`%s`](<%s>)", name, lavasrcInfo.URL)
 	}
 
-	return playlistType, fmt.Sprintf("`%s` - `%d tracks`", name, len(playlist.Tracks))
+	return playlistType, fmt.Sprintf("`%s`", name)
 }

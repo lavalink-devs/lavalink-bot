@@ -14,6 +14,7 @@ import (
 	"github.com/disgoorg/json"
 	"github.com/disgoorg/lavasearch-plugin"
 	"github.com/disgoorg/lavasrc-plugin"
+	"github.com/disgoorg/snowflake/v2"
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 	"go.deanishe.net/fuzzy"
 )
@@ -23,10 +24,25 @@ var (
 	queryPattern = regexp.MustCompile(`^(.{2})(search|isrc):(.+)`)
 )
 
+type UserData struct {
+	Requester  snowflake.ID `json:"requester"`
+	OriginType string       `json:"origin_type"`
+	OriginName string       `json:"origin_name"`
+}
+
 func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 	query := e.Data.String("query")
 	if query == "" {
 		return e.AutocompleteResult(nil)
+	}
+
+	if urlPattern.MatchString(query) {
+		return e.AutocompleteResult([]discord.AutocompleteChoice{
+			discord.AutocompleteChoiceString{
+				Name:  res.Trim("🔗 "+query, 100),
+				Value: query,
+			},
+		})
 	}
 
 	source := lavalink.SearchType(e.Data.String("source"))
@@ -186,6 +202,9 @@ func (c *Commands) Play(e *handler.CommandEvent) error {
 	var (
 		tracks         []lavalink.Track
 		messageContent string
+		userData       = UserData{
+			Requester: e.User().ID,
+		}
 	)
 	switch loadData := result.Data.(type) {
 	case lavalink.Track:
@@ -194,7 +213,9 @@ func (c *Commands) Play(e *handler.CommandEvent) error {
 	case lavalink.Playlist:
 		tracks = append(tracks, loadData.Tracks...)
 		playlistType, playlistName := res.FormatPlaylist(loadData)
-		messageContent = fmt.Sprintf("Loaded %s **%s**", playlistType, playlistName)
+		messageContent = fmt.Sprintf("Loaded %s **%s** - `%d tracks`", playlistType, playlistName, len(loadData.Tracks))
+		userData.OriginType = playlistType
+		userData.OriginName = playlistName
 	case lavalink.Search:
 		tracks = append(tracks, loadData[0])
 		messageContent = fmt.Sprintf("Loaded track **%s** from search", res.FormatTrack(loadData[0], 0))
@@ -221,6 +242,11 @@ func (c *Commands) Play(e *handler.CommandEvent) error {
 			Content: fmt.Sprintf("Failed to join voice channel: %s", err),
 		})
 		return err
+	}
+
+	userDataRaw, _ := json.Marshal(userData)
+	for i := range tracks {
+		tracks[i].UserData = userDataRaw
 	}
 
 	player := c.Lavalink.Player(*e.GuildID())

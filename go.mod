@@ -6,7 +6,7 @@ require (
 	github.com/disgoorg/disgo v0.17.0
 	github.com/disgoorg/disgolink/v3 v3.0.0-20231126174358-f0db0ed57f17
 	github.com/disgoorg/json v1.1.0
-	github.com/disgoorg/lavasearch-plugin v0.0.0-20230812211104-12547850ae07
+	github.com/disgoorg/lavasearch-plugin v0.0.0-20231126231156-fe430d19229a
 	github.com/disgoorg/lavasrc-plugin v0.0.0-20230812211312-b2484e9b20da
 	github.com/disgoorg/snowflake/v2 v2.0.1
 	github.com/disgoorg/sponsorblock-plugin v0.0.0-20231123224051-77fcea11cfe1

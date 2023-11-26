@@ -13,8 +13,8 @@ github.com/disgoorg/disgolink/v3 v3.0.0-20231126174358-f0db0ed57f17 h1:UqxupfVPq
 github.com/disgoorg/disgolink/v3 v3.0.0-20231126174358-f0db0ed57f17/go.mod h1:YIwjIteZcjfI7HYZWH241iRI7RjTLoN51HLDOUHVSFI=
 github.com/disgoorg/json v1.1.0 h1:7xigHvomlVA9PQw9bMGO02PHGJJPqvX5AnwlYg/Tnys=
 github.com/disgoorg/json v1.1.0/go.mod h1:BHDwdde0rpQFDVsRLKhma6Y7fTbQKub/zdGO5O9NqqA=
-github.com/disgoorg/lavasearch-plugin v0.0.0-20230812211104-12547850ae07 h1:hf3vNsBK1gp1TEqonO3YYG8NxJswbLe6BusUalMnYfg=
-github.com/disgoorg/lavasearch-plugin v0.0.0-20230812211104-12547850ae07/go.mod h1:qyl69XAg8+hMv+Y76pBUm2bQQELwosh6vDd/2AHPln4=
+github.com/disgoorg/lavasearch-plugin v0.0.0-20231126231156-fe430d19229a h1:C/eCjy9VnmfFNSxJGHVZ8lWSuhvLUYRpeq03SKAa/dA=
+github.com/disgoorg/lavasearch-plugin v0.0.0-20231126231156-fe430d19229a/go.mod h1:WrZN9MFj+zicZ4nMQVzxRe2H979qkIv6yyOTpLEYurk=
 github.com/disgoorg/lavasrc-plugin v0.0.0-20230812211312-b2484e9b20da h1:Y/E2xHSgP3cFmepxaBNJlQWT0RUGm06kQ1iw5HUKH2s=
 github.com/disgoorg/lavasrc-plugin v0.0.0-20230812211312-b2484e9b20da/go.mod h1:DVsAmMZQDQR5VSG1bRjrVoZoJefSzwEmXkCUw9lKI/A=
 github.com/disgoorg/snowflake/v2 v2.0.1 h1:CuUxGLwggUxEswZOmZ+mZ5i0xSumQdXW9tXW7uGqe+0=

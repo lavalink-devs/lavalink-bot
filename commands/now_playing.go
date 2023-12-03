@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	"fmt"
 
 	"github.com/disgoorg/disgo/discord"
@@ -19,7 +20,16 @@ func (c *Commands) NowPlaying(e *handler.CommandEvent) error {
 		})
 	}
 	content := fmt.Sprintf("Now playing: %s", res.FormatTrack(*track, player.Position()))
+	var userData UserData
+	_ = track.UserData.Unmarshal(&userData)
+	if userData.Requester > 0 {
+		content += "\nRequested by: " + discord.UserMention(userData.Requester)
+	}
+	if userData.OriginType == "playlist" {
+		content += fmt.Sprintf("\nFrom: %s", userData.OriginName)
+	}
 
+	var files []*discord.File
 	if e.SlashCommandInteractionData().Bool("raw") {
 		data, err := json.MarshalIndent(track, "", "  ")
 		if err != nil {
@@ -28,11 +38,15 @@ func (c *Commands) NowPlaying(e *handler.CommandEvent) error {
 				Flags:   discord.MessageFlagEphemeral,
 			})
 		}
-
-		content += fmt.Sprintf("\n```json\n%s\n```", data)
+		files = append(files, &discord.File{
+			Name:   "track.json",
+			Reader: bytes.NewReader(data),
+		})
 	}
 
 	return e.CreateMessage(discord.MessageCreate{
-		Content: content,
+		Content:         content,
+		AllowedMentions: &discord.AllowedMentions{},
+		Files:           files,
 	})
 }

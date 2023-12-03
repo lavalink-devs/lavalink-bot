@@ -126,7 +126,6 @@ func (h *Handlers) OnTrackStuck(p disgolink.Player, event lavalink.TrackStuckEve
 }
 
 func (h *Handlers) OnWebSocketClosed(p disgolink.Player, event lavalink.WebSocketClosedEvent) {
-	slog.Info("websocket closed: %s, code: %d, reason: %s", event.GuildID(), event.Code, event.Reason)
 	slog.Info("websocket closed", slog.Int64("guild_id", int64(event.GuildID())), slog.Int("code", event.Code), slog.String("reason", event.Reason))
 }
 

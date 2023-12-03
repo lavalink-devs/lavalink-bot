@@ -4,10 +4,10 @@ go 1.21
 
 require (
 	github.com/disgoorg/disgo v0.17.0
-	github.com/disgoorg/disgolink/v3 v3.0.0-20231126174358-f0db0ed57f17
+	github.com/disgoorg/disgolink/v3 v3.0.0-20231203111018-1106c2db18ac
 	github.com/disgoorg/json v1.1.0
-	github.com/disgoorg/lavasearch-plugin v0.0.0-20231126231156-fe430d19229a
-	github.com/disgoorg/lavasrc-plugin v0.0.0-20230812211312-b2484e9b20da
+	github.com/disgoorg/lavasearch-plugin v0.0.0-20231203111747-d94fed64e77d
+	github.com/disgoorg/lavasrc-plugin v0.0.0-20231203111728-1ac219b995be
 	github.com/disgoorg/snowflake/v2 v2.0.1
 	github.com/disgoorg/sponsorblock-plugin v0.0.0-20231123224051-77fcea11cfe1
 	github.com/google/go-github/v52 v52.0.0
@@ -25,12 +25,12 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/magefile/mage v1.15.0 // indirect
-	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/sasha-s/go-csync v0.0.0-20210812194225-61421b77c44b // indirect
-	golang.org/x/crypto v0.15.0 // indirect
-	golang.org/x/net v0.18.0 // indirect
-	golang.org/x/oauth2 v0.14.0 // indirect
-	golang.org/x/sys v0.14.0 // indirect
+	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/oauth2 v0.15.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect

@@ -10,9 +10,18 @@ import (
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/json"
 	"github.com/disgoorg/lavalyrics-plugin"
+	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 
 func (c *Commands) Lyrics(e *handler.CommandEvent) error {
+	player := c.Lavalink.ExistingPlayer(*e.GuildID())
+	track := player.Track()
+	if track == nil {
+		return e.CreateMessage(discord.MessageCreate{
+			Content: "no track playing",
+			Flags:   discord.MessageFlagEphemeral,
+		})
+	}
 	if err := e.DeferCreateMessage(false); err != nil {
 		return err
 	}
@@ -39,6 +48,7 @@ func (c *Commands) Lyrics(e *handler.CommandEvent) error {
 	}
 
 	_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
+		Content: json.Ptr(fmt.Sprintf("Loaded lyrics for %s from `%s`", res.FormatTrack(*track, 0), lyrics.SourceName)),
 		Files: []*discord.File{
 			discord.NewFile("lyrics.txt", "", bytes.NewReader([]byte(content))),
 		},

@@ -8,6 +8,8 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/json"
+
+	"github.com/lavalink-devs/lavalink-bot/internal/trackdecode"
 )
 
 var decode = discord.SlashCommandCreate{
@@ -19,11 +21,36 @@ var decode = discord.SlashCommandCreate{
 			Description: "The base64 encoded lavalink track",
 			Required:    true,
 		},
+		discord.ApplicationCommandOptionBool{
+			Name:        "lavalink",
+			Description: "If the Lavalink server should be used for decoding",
+			Required:    false,
+		},
 	},
 }
 
 func (c *Commands) Decode(e *handler.CommandEvent) error {
 	track := e.SlashCommandInteractionData().String("track")
+	lavalink := e.SlashCommandInteractionData().Bool("lavalink")
+
+	if !lavalink {
+		var content string
+		decoded, version, err := trackdecode.DecodeString(track)
+		if err != nil {
+			content += fmt.Sprintf("error while decoding track: %s\n", err.Error())
+		}
+		if version > 0 {
+			content += fmt.Sprintf("track was encoded with version: `%d`\n", version)
+		}
+		if decoded != nil {
+			data, _ := json.MarshalIndent(decoded, "", "  ")
+			content += fmt.Sprintf("```json\n%s\n```", data)
+		}
+
+		return e.CreateMessage(discord.MessageCreate{
+			Content: content,
+		})
+	}
 
 	if err := e.DeferCreateMessage(false); err != nil {
 		return err
@@ -31,7 +58,7 @@ func (c *Commands) Decode(e *handler.CommandEvent) error {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	decoded, err := c.Lavalink.BestNode().Rest().DecodeTracks(ctx, []string{track})
+	decoded, err := c.Lavalink.BestNode().Rest().DecodeTrack(ctx, track)
 	if err != nil {
 		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr(fmt.Sprintf("failed to decode track: %s", err)),
@@ -39,7 +66,7 @@ func (c *Commands) Decode(e *handler.CommandEvent) error {
 		return err
 	}
 
-	data, err := json.MarshalIndent(decoded[0], "", "  ")
+	data, err := json.MarshalIndent(decoded, "", "  ")
 	if err != nil {
 		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr(fmt.Sprintf("failed to decode track: %s", err)),

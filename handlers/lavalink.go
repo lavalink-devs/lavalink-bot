@@ -46,6 +46,9 @@ func (h *Handlers) OnVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {
 }
 
 func (h *Handlers) OnVoiceServerUpdate(event *events.VoiceServerUpdate) {
+	if event.Endpoint == nil {
+		return
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	h.Lavalink.OnVoiceServerUpdate(ctx, event.GuildID, event.Token, *event.Endpoint)

@@ -10,56 +10,50 @@ import (
 
 	"github.com/disgoorg/disgolink/v3/lavalink"
 	"github.com/disgoorg/json"
-	"github.com/disgoorg/lavasrc-plugin"
 )
 
 const trackInfoVersioned int32 = 1
 
+type lavaSrcTrackInfo struct {
+	AlbumName        *string `json:"albumName"`
+	AlbumURL         *string `json:"albumUrl"`
+	ArtistURL        *string `json:"artistUrl"`
+	ArtistArtworkURL *string `json:"artistArtworkUrl"`
+	PreviewURL       *string `json:"previewUrl"`
+	IsPreview        bool    `json:"isPreview"`
+}
+
 func decodeLavaSrcExtendedFields(track *lavalink.Track, r io.Reader) error {
-	var info lavasrc.TrackInfo
+	var info lavaSrcTrackInfo
 	defer func() {
 		raw, _ := json.Marshal(info)
 		track.PluginInfo = raw
 	}()
 
-	albumName, err := readNullableString(r)
+	var err error
+	info.AlbumName, err = readNullableString(r)
 	if err != nil {
 		return fmt.Errorf("failed to read track album name: %w", err)
 	}
-	if albumName != nil {
-		info.AlbumName = *albumName
-	}
 
-	albumURL, err := readNullableString(r)
+	info.AlbumURL, err = readNullableString(r)
 	if err != nil {
 		return fmt.Errorf("failed to read track album url: %w", err)
 	}
-	if albumURL != nil {
-		info.ArtistURL = *albumURL
-	}
 
-	artistURL, err := readNullableString(r)
+	info.ArtistURL, err = readNullableString(r)
 	if err != nil {
 		return fmt.Errorf("failed to read track artist url: %w", err)
 	}
-	if artistURL != nil {
-		info.ArtistURL = *artistURL
-	}
 
-	artistArtworkURL, err := readNullableString(r)
+	info.ArtistArtworkURL, err = readNullableString(r)
 	if err != nil {
 		return fmt.Errorf("failed to read track artist artwork url: %w", err)
 	}
-	if artistArtworkURL != nil {
-		info.ArtistArtworkURL = *artistArtworkURL
-	}
 
-	previewURL, err := readNullableString(r)
+	info.PreviewURL, err = readNullableString(r)
 	if err != nil {
 		return fmt.Errorf("failed to read track preview url: %w", err)
-	}
-	if previewURL != nil {
-		info.PreviewURL = *previewURL
 	}
 
 	info.IsPreview, err = readBool(r)

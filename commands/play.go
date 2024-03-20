@@ -58,7 +58,9 @@ func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 		types = append(types, lavasearch.SearchType(searchType))
 	}
 
-	result, err := lavasearch.LoadSearch(c.Lavalink.BestNode().Rest(), query, types)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	result, err := lavasearch.LoadSearch(ctx, c.Lavalink.BestNode().Rest(), query, types)
 	if err != nil {
 		if errors.Is(err, lavasearch.ErrEmptySearchResult) {
 			return e.AutocompleteResult(nil)

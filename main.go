@@ -63,6 +63,7 @@ func main() {
 		r.Autocomplete("/play", cmds.PlayAutocomplete)
 		r.Group(func(r handler.Router) {
 			r.Use(cmds.RequirePlayer)
+			r.Command("/lyrics", cmds.Lyrics)
 
 			r.Command("/stop", cmds.Stop)
 			r.Command("/disconnect", cmds.Disconnect)

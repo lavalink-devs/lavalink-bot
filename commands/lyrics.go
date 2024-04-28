@@ -16,10 +16,6 @@ import (
 func (c *Commands) Lyrics(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	skipTrackSource := data.Bool("skip-track-source")
 
-	if err := e.DeferCreateMessage(false); err != nil {
-		return err
-	}
-
 	var (
 		track  string
 		lyrics *lavalyrics.Lyrics
@@ -28,9 +24,12 @@ func (c *Commands) Lyrics(data discord.SlashCommandInteractionData, e *handler.C
 
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-
 	if encodedTrack, ok := data.OptString("track"); ok {
 		track = fmt.Sprintf("`%s`", encodedTrack)
+
+		if err = e.DeferCreateMessage(false); err != nil {
+			return err
+		}
 
 		lyrics, err = lavalyrics.GetLyrics(ctx, c.Lavalink.BestNode().Rest(), encodedTrack, skipTrackSource)
 	} else {
@@ -51,6 +50,10 @@ func (c *Commands) Lyrics(data discord.SlashCommandInteractionData, e *handler.C
 		}
 
 		track = res.FormatTrack(*playingTrack, 0)
+
+		if err = e.DeferCreateMessage(false); err != nil {
+			return err
+		}
 
 		lyrics, err = lavalyrics.GetCurrentTrackLyrics(ctx, player.Node().Rest(), player.Node().SessionID(), *e.GuildID(), skipTrackSource)
 	}

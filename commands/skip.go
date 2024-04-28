@@ -9,8 +9,8 @@ import (
 	"github.com/disgoorg/disgolink/v3/lavalink"
 )
 
-func (c *Commands) Skip(e *handler.CommandEvent) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (c *Commands) Skip(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
 	player := c.Lavalink.ExistingPlayer(*e.GuildID())
 	track, ok := c.MusicQueue.Next(*e.GuildID())

@@ -13,27 +13,57 @@ import (
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 
-func (c *Commands) Lyrics(e *handler.CommandEvent) error {
-	player := c.Lavalink.ExistingPlayer(*e.GuildID())
-	track := player.Track()
-	if track == nil {
-		return e.CreateMessage(discord.MessageCreate{
-			Content: "no track playing",
-			Flags:   discord.MessageFlagEphemeral,
-		})
-	}
+func (c *Commands) Lyrics(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+	skipTrackSource := data.Bool("skip-track-source")
+
 	if err := e.DeferCreateMessage(false); err != nil {
 		return err
 	}
 
-	node := c.Lavalink.BestNode()
+	var (
+		track  string
+		lyrics *lavalyrics.Lyrics
+		err    error
+	)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-	lyrics, err := lavalyrics.GetLyrics(ctx, node.Rest(), node.SessionID(), *e.GuildID())
+
+	if encodedTrack, ok := data.OptString("track"); ok {
+		track = fmt.Sprintf("`%s`", encodedTrack)
+
+		lyrics, err = lavalyrics.GetLyrics(ctx, c.Lavalink.BestNode().Rest(), encodedTrack, skipTrackSource)
+	} else {
+		player := c.Lavalink.ExistingPlayer(*e.GuildID())
+		if player == nil {
+			return e.CreateMessage(discord.MessageCreate{
+				Content: "No player found",
+				Flags:   discord.MessageFlagEphemeral,
+			})
+		}
+
+		playingTrack := player.Track()
+		if playingTrack == nil {
+			return e.CreateMessage(discord.MessageCreate{
+				Content: "no track playing",
+				Flags:   discord.MessageFlagEphemeral,
+			})
+		}
+
+		track = res.FormatTrack(*playingTrack, 0)
+
+		lyrics, err = lavalyrics.GetCurrentTrackLyrics(ctx, player.Node().Rest(), player.Node().SessionID(), *e.GuildID(), skipTrackSource)
+	}
 	if err != nil {
 		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr(fmt.Sprintf("failed to decode track: %s", err)),
+		})
+		return err
+	}
+
+	if lyrics == nil {
+		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
+			Content: json.Ptr("no lyrics found"),
 		})
 		return err
 	}
@@ -48,7 +78,7 @@ func (c *Commands) Lyrics(e *handler.CommandEvent) error {
 	}
 
 	_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
-		Content: json.Ptr(fmt.Sprintf("Loaded lyrics for %s from `%s`", res.FormatTrack(*track, 0), lyrics.SourceName)),
+		Content: json.Ptr(fmt.Sprintf("Loaded lyrics for %s from `%s`(`%s`)", track, lyrics.SourceName, lyrics.Provider)),
 		Files: []*discord.File{
 			discord.NewFile("lyrics.txt", "", bytes.NewReader([]byte(content))),
 		},

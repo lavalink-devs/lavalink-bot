@@ -8,7 +8,7 @@ import (
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 
-func (c *Commands) Queue(e *handler.CommandEvent) error {
+func (c *Commands) Queue(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	_, tracks := c.MusicQueue.Get(*e.GuildID())
 	if len(tracks) == 0 {
 		return e.CreateMessage(discord.MessageCreate{

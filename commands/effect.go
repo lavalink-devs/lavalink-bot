@@ -97,8 +97,8 @@ var effects = map[EffectType]lavalink.Filters{
 	},
 }
 
-func (c *Commands) Effects(e *handler.CommandEvent) error {
-	effectType := EffectType(e.SlashCommandInteractionData().String("effect"))
+func (c *Commands) Effects(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+	effectType := EffectType(data.String("effect"))
 	if err := c.Lavalink.ExistingPlayer(*e.GuildID()).Update(context.Background(), lavalink.WithFilters(effects[effectType])); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: fmt.Sprintf("failed to appply effect: `%s`", err),

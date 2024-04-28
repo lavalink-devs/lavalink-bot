@@ -10,7 +10,7 @@ import (
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 
-func (c *Commands) NowPlaying(e *handler.CommandEvent) error {
+func (c *Commands) NowPlaying(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	player := c.Lavalink.Player(*e.GuildID())
 	track := player.Track()
 	if track == nil {
@@ -30,8 +30,8 @@ func (c *Commands) NowPlaying(e *handler.CommandEvent) error {
 	}
 
 	var files []*discord.File
-	if e.SlashCommandInteractionData().Bool("raw") {
-		data, err := json.MarshalIndent(track, "", "  ")
+	if data.Bool("raw") {
+		decodedData, err := json.MarshalIndent(track, "", "  ")
 		if err != nil {
 			return e.CreateMessage(discord.MessageCreate{
 				Content: fmt.Sprintf("Failed to marshal track: %s", err),
@@ -40,7 +40,7 @@ func (c *Commands) NowPlaying(e *handler.CommandEvent) error {
 		}
 		files = append(files, &discord.File{
 			Name:   "track.json",
-			Reader: bytes.NewReader(data),
+			Reader: bytes.NewReader(decodedData),
 		})
 	}
 

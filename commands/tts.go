@@ -8,8 +8,7 @@ import (
 	"github.com/disgoorg/disgo/handler"
 )
 
-func (c *Commands) TTS(e *handler.CommandEvent) error {
-	data := e.SlashCommandInteractionData()
+func (c *Commands) TTS(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	message := data.String("message")
 
 	tts := url.URL{

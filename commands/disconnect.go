@@ -8,8 +8,8 @@ import (
 	"github.com/disgoorg/disgo/handler"
 )
 
-func (c *Commands) Disconnect(e *handler.CommandEvent) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (c *Commands) Disconnect(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
 
 	if err := c.Client.UpdateVoiceState(ctx, *e.GuildID(), nil, false, false); err != nil {

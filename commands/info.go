@@ -27,7 +27,7 @@ var info = discord.SlashCommandCreate{
 	},
 }
 
-func (c *Commands) InfoBot(e *handler.CommandEvent) error {
+func (c *Commands) InfoBot(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	var fields []discord.EmbedField
 	c.Lavalink.ForNodes(func(node disgolink.Node) {
 		version, err := node.Version(context.TODO())
@@ -65,7 +65,7 @@ func (c *Commands) InfoBot(e *handler.CommandEvent) error {
 	})
 }
 
-func (c *Commands) InfoLavalink(e *handler.CommandEvent) error {
+func (c *Commands) InfoLavalink(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	nodeInfos := map[string]lavalink.Info{}
 	c.Lavalink.ForNodes(func(node disgolink.Node) {
 		nodeInfo, err := node.Info(context.TODO())

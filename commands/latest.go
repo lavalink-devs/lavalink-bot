@@ -45,7 +45,7 @@ func (c *Commands) LatestAutocomplete(e *handler.AutocompleteEvent) error {
 	return e.AutocompleteResult(choices)
 }
 
-func (c *Commands) Latest(e *handler.CommandEvent) error {
+func (c *Commands) Latest(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	if err := e.DeferCreateMessage(false); err != nil {
 		return err
 	}

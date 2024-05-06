@@ -58,7 +58,9 @@ func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 		types = append(types, lavasearch.SearchType(searchType))
 	}
 
-	result, err := lavasearch.LoadSearch(c.Lavalink.BestNode().Rest(), query, types)
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
+	defer cancel()
+	result, err := lavasearch.LoadSearch(ctx, c.Lavalink.BestNode().Rest(), query, types)
 	if err != nil {
 		if errors.Is(err, lavasearch.ErrEmptySearchResult) {
 			return e.AutocompleteResult(nil)
@@ -162,7 +164,7 @@ func (c Choices) Swap(i, j int) {
 	c[i], c[j] = c[j], c[i]
 }
 
-func (c *Commands) Play(e *handler.CommandEvent) error {
+func (c *Commands) Play(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	voiceState, ok := c.Client.Caches().VoiceState(*e.GuildID(), e.User().ID)
 	if !ok {
 		return e.CreateMessage(discord.MessageCreate{
@@ -170,8 +172,6 @@ func (c *Commands) Play(e *handler.CommandEvent) error {
 			Flags:   discord.MessageFlagEphemeral,
 		})
 	}
-
-	data := e.SlashCommandInteractionData()
 
 	query := data.String("query")
 
@@ -189,7 +189,7 @@ func (c *Commands) Play(e *handler.CommandEvent) error {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
 	result, err := c.Lavalink.BestNode().LoadTracks(ctx, query)
 	if err != nil {
@@ -259,7 +259,7 @@ func (c *Commands) Play(e *handler.CommandEvent) error {
 			track, tracks = tracks[0], tracks[1:]
 		}
 
-		playCtx, playCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		playCtx, playCancel := context.WithTimeout(e.Ctx, 10*time.Second)
 		defer playCancel()
 		if err = player.Update(playCtx, lavalink.WithTrack(track)); err != nil {
 			_, err = e.CreateFollowupMessage(discord.MessageCreate{

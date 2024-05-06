@@ -5,7 +5,7 @@ import (
 	"github.com/disgoorg/disgo/handler"
 )
 
-func (c *Commands) Shuffle(e *handler.CommandEvent) error {
+func (c *Commands) Shuffle(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	ok := c.MusicQueue.Shuffle(*e.GuildID())
 	if !ok {
 		return e.CreateMessage(discord.MessageCreate{

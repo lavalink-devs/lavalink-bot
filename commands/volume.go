@@ -10,8 +10,8 @@ import (
 	"github.com/disgoorg/disgolink/v3/lavalink"
 )
 
-func (c *Commands) Volume(e *handler.CommandEvent) error {
-	volume := e.SlashCommandInteractionData().Int("volume")
+func (c *Commands) Volume(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+	volume := data.Int("volume")
 	player := c.Lavalink.ExistingPlayer(*e.GuildID())
 	oldVolume := player.Volume()
 
@@ -22,7 +22,7 @@ func (c *Commands) Volume(e *handler.CommandEvent) error {
 		})
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
 	if err := player.Update(ctx, lavalink.WithVolume(volume)); err != nil {
 		return e.CreateMessage(discord.MessageCreate{

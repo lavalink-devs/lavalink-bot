@@ -1,15 +1,20 @@
 package commands
 
 import (
+	"context"
+	"time"
+
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/sponsorblock-plugin"
 )
 
-func (c *Commands) ShowSponsorblock(e *handler.CommandEvent) error {
+func (c *Commands) ShowSponsorblock(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	node := c.Lavalink.Player(*e.GuildID()).Node()
 
-	categories, err := sponsorblock.GetCategories(node.Rest(), node.SessionID(), *e.GuildID())
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
+	defer cancel()
+	categories, err := sponsorblock.GetCategories(ctx, node.Rest(), node.SessionID(), *e.GuildID())
 	if err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "Failed to get categories: " + err.Error(),
@@ -27,8 +32,7 @@ func (c *Commands) ShowSponsorblock(e *handler.CommandEvent) error {
 	})
 }
 
-func (c *Commands) SetSponsorblock(e *handler.CommandEvent) error {
-	data := e.SlashCommandInteractionData()
+func (c *Commands) SetSponsorblock(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	node := c.Lavalink.Player(*e.GuildID()).Node()
 
 	var categories []sponsorblock.SegmentCategory
@@ -38,7 +42,9 @@ func (c *Commands) SetSponsorblock(e *handler.CommandEvent) error {
 		}
 	}
 
-	if err := sponsorblock.SetCategories(node.Rest(), node.SessionID(), *e.GuildID(), categories); err != nil {
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
+	defer cancel()
+	if err := sponsorblock.SetCategories(ctx, node.Rest(), node.SessionID(), *e.GuildID(), categories); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "Failed to set categories: " + err.Error(),
 			Flags:   discord.MessageFlagEphemeral,

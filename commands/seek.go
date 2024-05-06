@@ -11,12 +11,11 @@ import (
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 
-func (c *Commands) Seek(e *handler.CommandEvent) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func (c *Commands) Seek(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
 	player := c.Lavalink.ExistingPlayer(*e.GuildID())
 
-	data := e.SlashCommandInteractionData()
 	position := data.Int("position")
 	duration, ok := data.OptInt("unit")
 	if !ok {

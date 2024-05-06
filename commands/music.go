@@ -2,7 +2,6 @@ package commands
 
 import (
 	"github.com/disgoorg/disgo/discord"
-	"github.com/disgoorg/disgo/events"
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/disgolink/v3/lavalink"
 	"github.com/disgoorg/json"
@@ -305,13 +304,22 @@ var music = discord.SlashCommandCreate{
 				discord.ApplicationCommandOptionBool{
 					Name:        "raw",
 					Description: "Whether to include the raw track & info",
-					Required:    false,
 				},
 			},
 		},
 		discord.ApplicationCommandOptionSubCommand{
 			Name:        "lyrics",
-			Description: "Shows the lyrics of the current track",
+			Description: "Shows the lyrics of the current or a given track",
+			Options: []discord.ApplicationCommandOption{
+				discord.ApplicationCommandOptionBool{
+					Name:        "track",
+					Description: "Whether to include the raw lyrics",
+				},
+				discord.ApplicationCommandOptionBool{
+					Name:        "skip-track-source",
+					Description: "Whether to skip the track source to resolve the lyrics",
+				},
+			},
 		},
 		discord.ApplicationCommandOptionSubCommand{
 			Name:        "remove",
@@ -459,10 +467,10 @@ var music = discord.SlashCommandCreate{
 }
 
 func (c *Commands) RequirePlayer(next handler.Handler) handler.Handler {
-	return func(e *events.InteractionCreate) error {
+	return func(e *handler.InteractionEvent) error {
 		if e.Type() == discord.InteractionTypeApplicationCommand {
 			if player := c.Lavalink.ExistingPlayer(*e.GuildID()); player == nil {
-				return e.Respond(discord.InteractionResponseTypeCreateMessage, discord.MessageCreate{
+				return e.CreateMessage(discord.MessageCreate{
 					Content: "No player found",
 					Flags:   discord.MessageFlagEphemeral,
 				})

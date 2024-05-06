@@ -29,9 +29,9 @@ var decode = discord.SlashCommandCreate{
 	},
 }
 
-func (c *Commands) Decode(e *handler.CommandEvent) error {
-	track := e.SlashCommandInteractionData().String("track")
-	lavalink := e.SlashCommandInteractionData().Bool("lavalink")
+func (c *Commands) Decode(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+	track := data.String("track")
+	lavalink := data.Bool("lavalink")
 
 	if !lavalink {
 		var content string
@@ -43,8 +43,8 @@ func (c *Commands) Decode(e *handler.CommandEvent) error {
 			content += fmt.Sprintf("track was encoded with version: `%d`\n", version)
 		}
 		if decoded != nil {
-			data, _ := json.MarshalIndent(decoded, "", "  ")
-			content += fmt.Sprintf("```json\n%s\n```", data)
+			decodedData, _ := json.MarshalIndent(decoded, "", "  ")
+			content += fmt.Sprintf("```json\n%s\n```", decodedData)
 		}
 
 		return e.CreateMessage(discord.MessageCreate{
@@ -56,7 +56,7 @@ func (c *Commands) Decode(e *handler.CommandEvent) error {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
 	decoded, err := c.Lavalink.BestNode().Rest().DecodeTrack(ctx, track)
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *Commands) Decode(e *handler.CommandEvent) error {
 		return err
 	}
 
-	data, err := json.MarshalIndent(decoded, "", "  ")
+	decodedData, err := json.MarshalIndent(decoded, "", "  ")
 	if err != nil {
 		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr(fmt.Sprintf("failed to decode track: %s", err)),
@@ -75,7 +75,7 @@ func (c *Commands) Decode(e *handler.CommandEvent) error {
 	}
 
 	_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
-		Content: json.Ptr(fmt.Sprintf("```json\n%s\n```", data)),
+		Content: json.Ptr(fmt.Sprintf("```json\n%s\n```", decodedData)),
 	})
 	return err
 }

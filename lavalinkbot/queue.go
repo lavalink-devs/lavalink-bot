@@ -28,9 +28,10 @@ type PlayerManager struct {
 }
 
 type queue struct {
-	tracks    []lavalink.Track
-	mode      RepeatMode
-	channelID snowflake.ID
+	tracks          []lavalink.Track
+	mode            RepeatMode
+	channelID       snowflake.ID
+	lyricsMessageID snowflake.ID
 }
 
 func (q *PlayerManager) Get(guildID snowflake.ID) (RepeatMode, []lavalink.Track) {
@@ -60,6 +61,28 @@ func (q *PlayerManager) ChannelID(guildID snowflake.ID) snowflake.ID {
 		return 0
 	}
 	return qu.channelID
+}
+
+func (q *PlayerManager) SetLyricsMessageID(guildID snowflake.ID, messageID snowflake.ID) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+
+	qu, ok := q.queues[guildID]
+	if !ok {
+		return
+	}
+	qu.lyricsMessageID = messageID
+}
+
+func (q *PlayerManager) LyricsMessageID(guildID snowflake.ID) snowflake.ID {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+
+	qu, ok := q.queues[guildID]
+	if !ok {
+		return 0
+	}
+	return qu.lyricsMessageID
 }
 
 func (q *PlayerManager) Add(guildID snowflake.ID, channelID snowflake.ID, tracks ...lavalink.Track) {

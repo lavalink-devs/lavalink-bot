@@ -89,3 +89,55 @@ func (c *Commands) Lyrics(data discord.SlashCommandInteractionData, e *handler.C
 	})
 	return err
 }
+
+func (c *Commands) LiveLyricsSubscribe(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+	player := c.Lavalink.ExistingPlayer(*e.GuildID())
+	if player == nil {
+		return e.CreateMessage(discord.MessageCreate{
+			Content: "No player found",
+			Flags:   discord.MessageFlagEphemeral,
+		})
+	}
+
+	if err := e.DeferCreateMessage(false); err != nil {
+		return err
+	}
+
+	if err := lavalyrics.SubscribeLyrics(e.Ctx, player.Node().Rest(), player.Node().SessionID(), *e.GuildID()); err != nil {
+		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
+			Content: json.Ptr(fmt.Sprintf("failed to get subscribe to live lyrics: %s", err)),
+		})
+		return err
+	}
+
+	_, err := e.UpdateInteractionResponse(discord.MessageUpdate{
+		Content: json.Ptr(fmt.Sprintf("subscribed to live lyrics")),
+	})
+	return err
+}
+
+func (c *Commands) LiveLyricsUnsubscribe(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+	player := c.Lavalink.ExistingPlayer(*e.GuildID())
+	if player == nil {
+		return e.CreateMessage(discord.MessageCreate{
+			Content: "No player found",
+			Flags:   discord.MessageFlagEphemeral,
+		})
+	}
+
+	if err := e.DeferCreateMessage(false); err != nil {
+		return err
+	}
+
+	if err := lavalyrics.UnsubscribeLyrics(e.Ctx, player.Node().Rest(), player.Node().SessionID(), *e.GuildID()); err != nil {
+		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
+			Content: json.Ptr(fmt.Sprintf("failed to unsubscribe from live lyrics: %s", err)),
+		})
+		return err
+	}
+
+	_, err := e.UpdateInteractionResponse(discord.MessageUpdate{
+		Content: json.Ptr(fmt.Sprintf("unsubscribed from live lyrics")),
+	})
+	return err
+}

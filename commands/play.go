@@ -292,6 +292,8 @@ func (c *Commands) Play(data discord.SlashCommandInteractionData, e *handler.Com
 			track, tracks = tracks[0], tracks[1:]
 		}
 
+		c.MusicQueue.Add(*e.GuildID(), e.Channel().ID(), tracks...)
+
 		playCtx, playCancel := context.WithTimeout(e.Ctx, 10*time.Second)
 		defer playCancel()
 		if err = player.Update(playCtx, lavalink.WithTrack(track)); err != nil {
@@ -300,10 +302,10 @@ func (c *Commands) Play(data discord.SlashCommandInteractionData, e *handler.Com
 			})
 			return err
 		}
-	}
-	if len(tracks) > 0 {
+	} else {
 		c.MusicQueue.Add(*e.GuildID(), e.Channel().ID(), tracks...)
 	}
+
 	return nil
 }
 

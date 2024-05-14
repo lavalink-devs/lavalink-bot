@@ -478,6 +478,20 @@ var music = discord.SlashCommandCreate{
 				},
 			},
 		},
+		discord.ApplicationCommandOptionSubCommandGroup{
+			Name:        "live-lyrics",
+			Description: "Subscribes or unsubscribes to live lyrics",
+			Options: []discord.ApplicationCommandOptionSubCommand{
+				{
+					Name:        "subscribe",
+					Description: "Subscribes to live lyrics",
+				},
+				{
+					Name:        "unsubscribe",
+					Description: "Unsubscribes from live lyrics",
+				},
+			},
+		},
 	},
 }
 

@@ -19,6 +19,7 @@ import (
 	"github.com/disgoorg/disgo/handler/middleware"
 	"github.com/disgoorg/disgo/webhook"
 	"github.com/disgoorg/disgolink/v3/disgolink"
+	"github.com/disgoorg/lavalyrics-plugin"
 	"github.com/disgoorg/sponsorblock-plugin"
 	"github.com/google/go-github/v52/github"
 	"github.com/mattn/go-colorable"
@@ -82,6 +83,10 @@ func main() {
 		r.SlashCommand("/tts", cmds.TTS)
 		r.Autocomplete("/play", cmds.PlayAutocomplete)
 		r.SlashCommand("/lyrics", cmds.Lyrics)
+		r.Route("/live-lyrics", func(r handler.Router) {
+			r.SlashCommand("/subscribe", cmds.LiveLyricsSubscribe)
+			r.SlashCommand("/unsubscribe", cmds.LiveLyricsUnsubscribe)
+		})
 		r.Group(func(r handler.Router) {
 			r.Use(cmds.RequirePlayer)
 
@@ -141,8 +146,12 @@ func main() {
 	}
 
 	sponsorblockPlugin := sponsorblock.New()
+	lavalyricsPlugin := lavalyrics.New()
 	if b.Lavalink = disgolink.New(b.Client.ApplicationID(),
-		disgolink.WithPlugins(sponsorblockPlugin),
+		disgolink.WithPlugins(
+			sponsorblockPlugin,
+			lavalyricsPlugin,
+		),
 		disgolink.WithListenerFunc(hdlr.OnTrackStart),
 		disgolink.WithListenerFunc(hdlr.OnTrackEnd),
 		disgolink.WithListenerFunc(hdlr.OnTrackException),
@@ -153,6 +162,9 @@ func main() {
 		disgolink.WithListenerFunc(hdlr.OndSegmentSkipped),
 		disgolink.WithListenerFunc(hdlr.OnChaptersLoaded),
 		disgolink.WithListenerFunc(hdlr.OnChapterStarted),
+		disgolink.WithListenerFunc(hdlr.OnLyricsFound),
+		disgolink.WithListenerFunc(hdlr.OnLyricsNotFound),
+		disgolink.WithListenerFunc(hdlr.OnLyricsLine),
 	); err != nil {
 		slog.Error("failed to create disgolink client", tint.Err(err))
 		os.Exit(-1)

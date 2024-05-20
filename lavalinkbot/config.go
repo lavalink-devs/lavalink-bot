@@ -125,13 +125,17 @@ func (c PluginConfigs) String() string {
 }
 
 type PluginConfig struct {
+	Name       string `yaml:"name"`
 	Dependency string `yaml:"dependency"`
 	Repository string `yaml:"repository"`
+	Git        string `yaml:"git"`
 }
 
 func (c PluginConfig) String() string {
-	return fmt.Sprintf("\n   Dependency: %s\n   Repository: %s",
+	return fmt.Sprintf("\n   Name: %s\n   Dependency: %s\n   Repository: %s\n   Git: %s\n",
+		c.Name,
 		c.Dependency,
 		c.Repository,
+		c.Git,
 	)
 }

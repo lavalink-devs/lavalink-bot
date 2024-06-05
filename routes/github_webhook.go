@@ -97,10 +97,13 @@ func processReleaseEvent(b *lavalinkbot.Bot, e *github.ReleaseEvent) error {
 		Build(),
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to send message: %w", err)
 	}
 	_, err = b.Client.Rest().CrosspostMessage(msg.ChannelID, msg.ID)
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to crosspost message: %w", err)
+	}
+	return nil
 }
 
 func substr(input string, start int, length int) string {

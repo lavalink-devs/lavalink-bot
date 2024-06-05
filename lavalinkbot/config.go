@@ -80,7 +80,7 @@ func (c BotConfig) String() string {
 type GitHubConfig struct {
 	ServerAddr    string                         `yaml:"server_addr"`
 	WebhookSecret string                         `yaml:"webhook_secret"`
-	Releases      map[string]GithubReleaseConfig `yaml:"github_releases"`
+	Releases      map[string]GithubReleaseConfig `yaml:"releases"`
 }
 
 func (c GitHubConfig) String() string {

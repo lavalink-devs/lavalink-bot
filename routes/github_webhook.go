@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"errors"
 	"fmt"
 	"log/slog"
 	"net/http"
@@ -61,7 +60,7 @@ func processReleaseEvent(b *lavalinkbot.Bot, e *github.ReleaseEvent) error {
 
 	cfg, ok := b.Cfg.GitHub.Releases[fullName]
 	if !ok {
-		return errors.New("no config found for this repo")
+		return fmt.Errorf("no config found for %s", fullName)
 	}
 
 	webhookClient, ok := b.Webhooks[fullName]

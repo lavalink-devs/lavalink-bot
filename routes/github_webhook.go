@@ -20,6 +20,7 @@ var (
 	markdownCheckBoxCheckedRegex   = regexp.MustCompile(`([ \t]*)[*|-][ \t]{0,4}\[x][ \t]+([^\r\n]+)`)
 	markdownCheckBoxUncheckedRegex = regexp.MustCompile(`([ \t]*)[*|-][ \t]{0,4}\[ ][ \t]+([^\r\n]+)`)
 	prURLRegex                     = regexp.MustCompile(`https?://github\.com/(\w+/\w+)/pull/(\d+)`)
+	prNumberRegex                  = regexp.MustCompile(`#(\d+)`)
 	commitURLRegex                 = regexp.MustCompile(`https?://github\.com/\w+/\w+/commit/([a-f\d]{7})[a-f\d]+`)
 	mentionRegex                   = regexp.MustCompile(`@(\w+)`)
 )
@@ -69,7 +70,7 @@ func processReleaseEvent(b *lavalinkbot.Bot, e *github.ReleaseEvent) error {
 		b.Webhooks[fullName] = webhookClient
 	}
 
-	message := parseMarkdown(e.GetRelease().GetBody())
+	message := parseMarkdown(e.GetRelease().GetBody(), fullName)
 	if len(message) > 1024 {
 		message = substr(message, 0, 1024)
 		if index := strings.LastIndex(message, "\n"); index != -1 {
@@ -116,12 +117,13 @@ func substr(input string, start int, length int) string {
 	return string(asRunes[start : start+length])
 }
 
-func parseMarkdown(text string) string {
+func parseMarkdown(text string, repo string) string {
 	text = markdownCheckBoxCheckedRegex.ReplaceAllString(text, "$1:ballot_box_with_check: $2")
 	text = markdownCheckBoxUncheckedRegex.ReplaceAllString(text, "$1:white_square_button: $2")
 	text = markdownHeaderRegex.ReplaceAllString(text, "**$1**")
 	text = markdownBulletRegex.ReplaceAllString(text, "$1• $2")
 	text = prURLRegex.ReplaceAllString(text, "[$1#$2]($0)")
+	text = prNumberRegex.ReplaceAllString(text, "[#$1](https://github.com/"+repo+"/pull/$1)")
 	text = commitURLRegex.ReplaceAllString(text, "[`$1`]($0)")
 	text = mentionRegex.ReplaceAllString(text, "[@$1](https://github.com/$1)")
 	return text

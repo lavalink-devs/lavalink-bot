@@ -6,6 +6,15 @@ bot:
   token: ...
   guild_ids: [ ... ]
 
+github:
+  server_addr: ":8080"
+  webhook_secret: ""
+  releases:
+    user/repo:
+      webhook_id: 1248018508823138376
+      webhook_token: "..."
+      ping_role: 123456789012345678
+
 nodes:
   - name: node1
     address: localhost:2333

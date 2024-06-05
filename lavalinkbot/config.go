@@ -35,6 +35,7 @@ func ReadConfig(path string) (Config, error) {
 type Config struct {
 	Log     LogConfig     `yaml:"log"`
 	Bot     BotConfig     `yaml:"bot"`
+	GitHub  GitHubConfig  `yaml:"github"`
 	Nodes   NodeConfigs   `yaml:"nodes"`
 	Plugins PluginConfigs `yaml:"plugins"`
 }
@@ -73,6 +74,38 @@ func (c BotConfig) String() string {
 	return fmt.Sprintf("\n  Token: %s\n  GuildIDs: %s",
 		c.Token,
 		c.GuildIDs,
+	)
+}
+
+type GitHubConfig struct {
+	ServerAddr    string                         `yaml:"server_addr"`
+	WebhookSecret string                         `yaml:"webhook_secret"`
+	Releases      map[string]GithubReleaseConfig `yaml:"github_releases"`
+}
+
+func (c GitHubConfig) String() string {
+	var s string
+	for repo, cfg := range c.Releases {
+		s += fmt.Sprintf("\n %s: %s", repo, cfg)
+	}
+	return fmt.Sprintf("\n  ServerAddr: %s\n  WebhookSecret: %s\n  Releases: %s",
+		c.ServerAddr,
+		c.WebhookSecret,
+		s,
+	)
+}
+
+type GithubReleaseConfig struct {
+	WebhookID    snowflake.ID `yaml:"webhook_id"`
+	WebhookToken string       `yaml:"webhook_token"`
+	PingRole     snowflake.ID `yaml:"ping_role"`
+}
+
+func (c GithubReleaseConfig) String() string {
+	return fmt.Sprintf("\n  WebhookID: %s\n  WebhookToken: %s\n  PingRole: %s",
+		c.WebhookID,
+		c.WebhookToken,
+		c.PingRole,
 	)
 }
 

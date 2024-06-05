@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/disgoorg/disgo/bot"
+	"github.com/disgoorg/disgo/webhook"
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/google/go-github/v52/github"
 	"github.com/topi314/tint"
@@ -22,6 +23,7 @@ type Bot struct {
 	Lavalink   disgolink.Client
 	GitHub     *github.Client
 	MusicQueue *PlayerManager
+	Webhooks   map[string]webhook.Client
 }
 
 func (b *Bot) Start() error {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"log/slog"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 	"github.com/disgoorg/disgo/gateway"
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/disgo/handler/middleware"
+	"github.com/disgoorg/disgo/webhook"
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/sponsorblock-plugin"
 	"github.com/google/go-github/v52/github"
@@ -22,6 +24,7 @@ import (
 	"github.com/lavalink-devs/lavalink-bot/handlers"
 	"github.com/lavalink-devs/lavalink-bot/internal/maven"
 	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
+	"github.com/lavalink-devs/lavalink-bot/routes"
 	"github.com/mattn/go-colorable"
 	"github.com/topi314/tint"
 )
@@ -46,6 +49,7 @@ func main() {
 			Timeout: 10 * time.Second,
 		}),
 		MusicQueue: lavalinkbot.NewPlayerManager(),
+		Webhooks:   map[string]webhook.Client{},
 	}
 
 	cmds := &commands.Commands{Bot: b}
@@ -91,6 +95,15 @@ func main() {
 	})
 
 	hdlr := &handlers.Handlers{Bot: b}
+
+	mux := http.NewServeMux()
+	mux.Handle("POST /github/webhook", routes.HandleGithubWebhook(b))
+
+	go func() {
+		if err := http.ListenAndServe(cfg.GitHub.ServerAddr, mux); err != nil && !errors.Is(err, http.ErrServerClosed) {
+			slog.Error("failed to start github webhook server", tint.Err(err))
+		}
+	}()
 
 	if b.Client, err = disgo.New(cfg.Bot.Token,
 		bot.WithGatewayConfigOpts(

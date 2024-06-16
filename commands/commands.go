@@ -2,6 +2,7 @@ package commands
 
 import (
 	"github.com/disgoorg/disgo/discord"
+
 	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 )
 

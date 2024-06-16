@@ -10,6 +10,7 @@ import (
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/json"
 	"github.com/disgoorg/lavalyrics-plugin"
+
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 

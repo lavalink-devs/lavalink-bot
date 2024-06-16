@@ -10,8 +10,9 @@ import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/webhook"
 	"github.com/google/go-github/v52/github"
-	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 	"github.com/topi314/tint"
+
+	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 )
 
 var (

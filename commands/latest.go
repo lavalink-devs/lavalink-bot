@@ -8,8 +8,9 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 	"github.com/lithammer/fuzzysearch/fuzzy"
+
+	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 )
 
 var latest = discord.SlashCommandCreate{

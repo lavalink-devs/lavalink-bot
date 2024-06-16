@@ -20,13 +20,14 @@ import (
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/sponsorblock-plugin"
 	"github.com/google/go-github/v52/github"
+	"github.com/mattn/go-colorable"
+	"github.com/topi314/tint"
+
 	"github.com/lavalink-devs/lavalink-bot/commands"
 	"github.com/lavalink-devs/lavalink-bot/handlers"
 	"github.com/lavalink-devs/lavalink-bot/internal/maven"
 	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 	"github.com/lavalink-devs/lavalink-bot/routes"
-	"github.com/mattn/go-colorable"
-	"github.com/topi314/tint"
 )
 
 func main() {

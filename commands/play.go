@@ -15,8 +15,9 @@ import (
 	"github.com/disgoorg/lavasearch-plugin"
 	"github.com/disgoorg/lavasrc-plugin"
 	"github.com/disgoorg/snowflake/v2"
-	"github.com/lavalink-devs/lavalink-bot/internal/res"
 	"go.deanishe.net/fuzzy"
+
+	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 
 var (

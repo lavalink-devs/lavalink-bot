@@ -11,9 +11,10 @@ import (
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/disgolink/v3/lavalink"
 	"github.com/disgoorg/sponsorblock-plugin"
+	"github.com/topi314/tint"
+
 	"github.com/lavalink-devs/lavalink-bot/commands"
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
-	"github.com/topi314/tint"
 )
 
 func (h *Handlers) OnVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {

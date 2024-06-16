@@ -5,6 +5,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
+
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 

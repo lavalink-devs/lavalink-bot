@@ -274,3 +274,62 @@ func (c *Commands) Play(data discord.SlashCommandInteractionData, e *handler.Com
 	}
 	return nil
 }
+
+func (c *Commands) PlayTrack(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+	voiceState, ok := c.Client.Caches().VoiceState(*e.GuildID(), e.User().ID)
+	if !ok {
+		return e.CreateMessage(discord.MessageCreate{
+			Content: "You need to be in a voice channel to use this command.",
+			Flags:   discord.MessageFlagEphemeral,
+		})
+	}
+
+	encodedTrack := data.String("track")
+
+	if err := e.DeferCreateMessage(false); err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
+	defer cancel()
+	track, err := c.Lavalink.BestNode().DecodeTrack(ctx, encodedTrack)
+	if err != nil {
+		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
+			Content: json.Ptr(fmt.Sprintf("Failed to decode track: %s", err)),
+		})
+		return err
+	}
+
+	userDataRaw, _ := json.Marshal(UserData{
+		Requester: e.User().ID,
+	})
+	track.UserData = userDataRaw
+
+	if _, err = e.UpdateInteractionResponse(discord.MessageUpdate{
+		Content: json.Ptr(fmt.Sprintf("Loaded track **%s**", res.FormatTrack(*track, 0))),
+	}); err != nil {
+		return err
+	}
+
+	if err = c.Client.UpdateVoiceState(context.Background(), *e.GuildID(), voiceState.ChannelID, false, false); err != nil {
+		_, err = e.CreateFollowupMessage(discord.MessageCreate{
+			Content: fmt.Sprintf("Failed to join voice channel: %s", err),
+		})
+		return err
+	}
+
+	player := c.Lavalink.Player(*e.GuildID())
+	if player.Track() == nil {
+		playCtx, playCancel := context.WithTimeout(e.Ctx, 10*time.Second)
+		defer playCancel()
+		if err = player.Update(playCtx, lavalink.WithTrack(*track)); err != nil {
+			_, err = e.CreateFollowupMessage(discord.MessageCreate{
+				Content: fmt.Sprintf("Failed to play track: %s", err),
+			})
+			return err
+		}
+	} else {
+		c.MusicQueue.Add(*e.GuildID(), e.Channel().ID(), *track)
+	}
+	return nil
+}

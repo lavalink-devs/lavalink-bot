@@ -153,6 +153,17 @@ var music = discord.SlashCommandCreate{
 			},
 		},
 		discord.ApplicationCommandOptionSubCommand{
+			Name:        "play-track",
+			Description: "Plays a given encoded track",
+			Options: []discord.ApplicationCommandOption{
+				discord.ApplicationCommandOptionString{
+					Name:        "track",
+					Description: "The encoded track to play",
+					Required:    true,
+				},
+			},
+		},
+		discord.ApplicationCommandOptionSubCommand{
 			Name:        "tts",
 			Description: "Crafts a text-to-speech link to play",
 			Options: []discord.ApplicationCommandOption{

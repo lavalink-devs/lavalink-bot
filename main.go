@@ -65,6 +65,7 @@ func main() {
 
 	r.Route("/music", func(r handler.Router) {
 		r.SlashCommand("/play", cmds.Play)
+		r.SlashCommand("/play-track", cmds.PlayTrack)
 		r.SlashCommand("/tts", cmds.TTS)
 		r.Autocomplete("/play", cmds.PlayAutocomplete)
 		r.SlashCommand("/lyrics", cmds.Lyrics)

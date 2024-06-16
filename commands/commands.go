@@ -7,6 +7,7 @@ import (
 
 var CommandCreates = []discord.ApplicationCommandCreate{
 	decode,
+	resolve,
 	info,
 	latest,
 	music,

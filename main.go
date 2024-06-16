@@ -60,6 +60,7 @@ func main() {
 	r.SlashCommand("/latest", cmds.Latest)
 	r.Autocomplete("/latest", cmds.LatestAutocomplete)
 	r.SlashCommand("/decode", cmds.Decode)
+	r.SlashCommand("/resolve", cmds.Resolve)
 
 	r.Route("/music", func(r handler.Router) {
 		r.SlashCommand("/play", cmds.Play)

@@ -80,7 +80,7 @@ func main() {
 			r.SlashCommand("/seek", cmds.Seek)
 			r.SlashCommand("/volume", cmds.Volume)
 			r.SlashCommand("/shuffle", cmds.Shuffle)
-			// r.SlashCommand("/repeat", cmds.Repeat)
+			r.SlashCommand("/repeat", cmds.Repeat)
 			r.SlashCommand("/queue", cmds.Queue)
 			r.SlashCommand("/now-playing", cmds.NowPlaying)
 			// r.SlashCommand("/lyrics", cmds.Lyrics)

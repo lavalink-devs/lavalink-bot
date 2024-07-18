@@ -12,6 +12,7 @@ var CommandCreates = []discord.ApplicationCommandCreate{
 	info,
 	latest,
 	music,
+	read,
 }
 
 type Commands struct {

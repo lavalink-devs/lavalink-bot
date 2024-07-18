@@ -3,6 +3,7 @@ module github.com/lavalink-devs/lavalink-bot
 go 1.22
 
 require (
+	github.com/adrg/frontmatter v0.2.0
 	github.com/disgoorg/disgo v0.18.8
 	github.com/disgoorg/disgolink/v3 v3.0.1-0.20240311001109-56f250c13235
 	github.com/disgoorg/json v1.1.0
@@ -20,6 +21,7 @@ require (
 )
 
 require (
+	github.com/BurntSushi/toml v1.4.0 // indirect
 	github.com/ProtonMail/go-crypto v1.0.0 // indirect
 	github.com/cloudflare/circl v1.3.9 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -31,4 +33,5 @@ require (
 	golang.org/x/oauth2 v0.21.0 // indirect
 	golang.org/x/sys v0.22.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

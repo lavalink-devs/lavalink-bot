@@ -5,6 +5,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
+	"github.com/disgoorg/snowflake/v2"
 	"go.deanishe.net/fuzzy"
 
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
@@ -37,6 +38,9 @@ func (c *Commands) Read(data discord.SlashCommandInteractionData, e *handler.Com
 	user, ok := data.OptUser("user")
 	if ok {
 		msg.Content += fmt.Sprintf("Hey %s,\n", user.Mention())
+		msg.AllowedMentions = &discord.AllowedMentions{
+			Users: []snowflake.ID{user.ID},
+		}
 	}
 
 	thing, ok := c.Things[data.String("thing")]

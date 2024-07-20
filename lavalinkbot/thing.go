@@ -6,7 +6,7 @@ import (
 	"embed"
 	"fmt"
 	"io"
-	"path/filepath"
+	"path"
 
 	"github.com/adrg/frontmatter"
 )
@@ -22,7 +22,7 @@ func ReadThings(things embed.FS) (map[string]Thing, error) {
 		if !file.IsDir() {
 			continue
 		}
-		thingFiles, err := things.ReadDir(filepath.Join("things", file.Name()))
+		thingFiles, err := things.ReadDir(path.Join("things", file.Name()))
 		if err != nil {
 			return nil, err
 		}
@@ -30,7 +30,7 @@ func ReadThings(things embed.FS) (map[string]Thing, error) {
 		var thing Thing
 		for _, f := range thingFiles {
 			if f.Name() == "index.md" {
-				data, err := things.ReadFile(filepath.Join("things", file.Name(), "index.md"))
+				data, err := things.ReadFile(path.Join("things", file.Name(), "index.md"))
 				if err != nil {
 					return nil, fmt.Errorf("failed to read index.md for %s: %w", file.Name(), err)
 				}
@@ -47,7 +47,7 @@ func ReadThings(things embed.FS) (map[string]Thing, error) {
 				continue
 			}
 
-			data, err := things.ReadFile(filepath.Join("things", file.Name(), f.Name()))
+			data, err := things.ReadFile(path.Join("things", file.Name(), f.Name()))
 			if err != nil {
 				return nil, fmt.Errorf("failed to read file %s for %s: %w", f.Name(), file.Name(), err)
 			}

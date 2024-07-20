@@ -24,6 +24,7 @@ type Bot struct {
 	GitHub     *github.Client
 	MusicQueue *PlayerManager
 	Webhooks   map[string]webhook.Client
+	Things     map[string]Thing
 }
 
 func (b *Bot) Start() error {

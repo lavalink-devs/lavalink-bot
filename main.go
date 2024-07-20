@@ -1,6 +1,7 @@
 package main
 
 import (
+	"embed"
 	"errors"
 	"flag"
 	"log/slog"
@@ -30,6 +31,9 @@ import (
 	"github.com/lavalink-devs/lavalink-bot/routes"
 )
 
+//go:embed things
+var Things embed.FS
+
 func main() {
 	path := flag.String("config", "config.yml", "path to config.yml")
 	flag.Parse()
@@ -43,6 +47,12 @@ func main() {
 	slog.Info("starting lavalink-bot...", slog.String("disgo_version", disgo.Version), slog.String("disgolink_version", disgolink.Version))
 	slog.Info("Config", slog.String("path", *path), slog.String("config", cfg.String()))
 
+	things, err := lavalinkbot.ReadThings(Things)
+	if err != nil {
+		slog.Error("failed to read things", tint.Err(err))
+		os.Exit(-1)
+	}
+
 	b := &lavalinkbot.Bot{
 		Cfg:    cfg,
 		GitHub: github.NewClient(nil),
@@ -50,7 +60,8 @@ func main() {
 			Timeout: 10 * time.Second,
 		}),
 		MusicQueue: lavalinkbot.NewPlayerManager(),
-		Webhooks:   map[string]webhook.Client{},
+		Webhooks:   make(map[string]webhook.Client),
+		Things:     things,
 	}
 
 	cmds := &commands.Commands{Bot: b}
@@ -58,6 +69,8 @@ func main() {
 	r.Use(middleware.Go)
 	r.SlashCommand("/info/bot", cmds.InfoBot)
 	r.SlashCommand("/info/lavalink", cmds.InfoLavalink)
+	r.SlashCommand("/read", cmds.Read)
+	r.Autocomplete("/read", cmds.ReadAutocomplete)
 	r.SlashCommand("/latest", cmds.Latest)
 	r.Autocomplete("/latest", cmds.LatestAutocomplete)
 	r.SlashCommand("/decode", cmds.Decode)

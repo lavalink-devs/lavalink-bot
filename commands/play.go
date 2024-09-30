@@ -38,9 +38,40 @@ func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 	}
 
 	if urlPattern.MatchString(query) {
+		ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
+		defer cancel()
+		result, err := c.Lavalink.BestNode().LoadTracks(ctx, query)
+		if err != nil {
+			return e.AutocompleteResult([]discord.AutocompleteChoice{
+				discord.AutocompleteChoiceString{
+					Name:  res.Trim("Failed to load track: "+err.Error(), 100),
+					Value: "error",
+				},
+			})
+		}
+
+		var name string
+		switch loadData := result.Data.(type) {
+		case lavalink.Track:
+			name = fmt.Sprintf("%s - %s", loadData.Info.Title, loadData.Info.Author)
+		case lavalink.Playlist:
+			var playlistInfo lavasrc.PlaylistInfo
+			_ = loadData.PluginInfo.Unmarshal(&playlistInfo)
+			name = fmt.Sprintf("%s: %s - %s", playlistInfo.Type, loadData.Info.Name, playlistInfo.Author)
+		case lavalink.Empty:
+			return e.AutocompleteResult(nil)
+		case lavalink.Exception:
+			return e.AutocompleteResult([]discord.AutocompleteChoice{
+				discord.AutocompleteChoiceString{
+					Name:  res.Trim("Failed to load track: "+loadData.Error(), 100),
+					Value: "error",
+				},
+			})
+		}
+
 		return e.AutocompleteResult([]discord.AutocompleteChoice{
 			discord.AutocompleteChoiceString{
-				Name:  res.Trim("🔗 "+query, 100),
+				Name:  res.Trim("🔗 "+name, 100),
 				Value: query,
 			},
 		})

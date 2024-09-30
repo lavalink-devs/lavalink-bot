@@ -2,6 +2,7 @@ package res
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/disgoorg/disgolink/v3/lavalink"
 	"github.com/disgoorg/lavasrc-plugin"
@@ -29,9 +30,13 @@ func FormatTrack(track lavalink.Track, position lavalink.Duration) string {
 		}
 	}
 
-	trackName := fmt.Sprintf("`%s`", track.Info.Title)
+	title := track.Info.Title
+	title = strings.TrimPrefix(title, "https://")
+	title = strings.TrimPrefix(title, "http://")
+
+	trackName := fmt.Sprintf("`%s`", title)
 	if track.Info.URI != nil {
-		trackName = fmt.Sprintf("[`%s`](<%s>)", track.Info.Title, *track.Info.URI)
+		trackName = fmt.Sprintf("[`%s`](<%s>)", title, *track.Info.URI)
 	}
 
 	var albumName string

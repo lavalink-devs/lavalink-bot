@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"time"
@@ -42,13 +43,16 @@ func (c *Commands) Decode(data discord.SlashCommandInteractionData, e *handler.C
 		if version > 0 {
 			content += fmt.Sprintf("track was encoded with version: `%d`\n", version)
 		}
+		var decodedData []byte
 		if decoded != nil {
-			decodedData, _ := json.MarshalIndent(decoded, "", "  ")
-			content += fmt.Sprintf("```json\n%s\n```", decodedData)
+			decodedData, _ = json.MarshalIndent(decoded, "", "  ")
 		}
 
+		msg := jsonMessage(content, decodedData)
+
 		return e.CreateMessage(discord.MessageCreate{
-			Content: content,
+			Content: msg.Content,
+			Files:   msg.Files,
 		})
 	}
 
@@ -66,16 +70,36 @@ func (c *Commands) Decode(data discord.SlashCommandInteractionData, e *handler.C
 		return err
 	}
 
-	decodedData, err := json.MarshalIndent(decoded, "", "  ")
-	if err != nil {
-		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
-			Content: json.Ptr(fmt.Sprintf("failed to decode track: %s", err)),
-		})
-		return err
-	}
+	decodedData, _ := json.MarshalIndent(decoded, "", "  ")
+
+	msg := jsonMessage("", decodedData)
 
 	_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
-		Content: json.Ptr(fmt.Sprintf("```json\n%s\n```", decodedData)),
+		Content: &msg.Content,
+		Files:   msg.Files,
 	})
 	return err
+}
+
+type message struct {
+	Content string
+	Files   []*discord.File
+}
+
+func jsonMessage(msg string, jsonData []byte) message {
+	var (
+		content string
+		files   []*discord.File
+	)
+
+	if len([]rune(msg))+len(jsonData) > 2020 {
+		content = msg
+		files = append(files, discord.NewFile("track.json", "", bytes.NewReader(jsonData)))
+	} else {
+		content = fmt.Sprintf("%s\n\n```json\n%s\n```", msg, jsonData)
+	}
+	return message{
+		Content: content,
+		Files:   files,
+	}
 }

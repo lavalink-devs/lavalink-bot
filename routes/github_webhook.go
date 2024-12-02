@@ -23,7 +23,7 @@ var (
 	prURLRegex                     = regexp.MustCompile(`https?://github\.com/(\w+/\w+)/pull/(\d+)`)
 	prNumberRegex                  = regexp.MustCompile(`#(\d+)`)
 	commitURLRegex                 = regexp.MustCompile(`https?://github\.com/\w+/\w+/commit/([a-f\d]{7})[a-f\d]+`)
-	mentionRegex                   = regexp.MustCompile(`@(\w+)`)
+	mentionRegex                   = regexp.MustCompile(`@([a-zA-Z0-9-]+)`)
 )
 
 func HandleGithubWebhook(b *lavalinkbot.Bot) http.HandlerFunc {

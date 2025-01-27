@@ -55,7 +55,7 @@ func (c *Commands) Resolve(data discord.SlashCommandInteractionData, e *handler.
 			return err
 		}
 
-		if len(decodedData) > 2000 {
+		if len(decodedData) > 1900 {
 			files = append(files, &discord.File{
 				Name:   "result.json",
 				Reader: bytes.NewReader(decodedData),

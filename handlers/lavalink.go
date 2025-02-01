@@ -110,6 +110,7 @@ func (h *Handlers) OnTrackException(p disgolink.Player, event lavalink.TrackExce
 	}
 	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
 		Content:         "Track exception: " + event.Exception.Error(),
+		Files:           []*discord.File{res.NewExceptionFile(event.Exception.CauseStackTrace)},
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
 		slog.Error("failed to send message", tint.Err(err))

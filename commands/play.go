@@ -259,6 +259,7 @@ func (c *Commands) Play(data discord.SlashCommandInteractionData, e *handler.Com
 	case lavalink.Exception:
 		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr(fmt.Sprintf("Failed to load tracks: %s", loadData.Error())),
+			Files:   []*discord.File{res.NewExceptionFile(loadData.CauseStackTrace)},
 		})
 		return err
 	}

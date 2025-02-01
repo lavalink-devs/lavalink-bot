@@ -10,6 +10,8 @@ import (
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/disgolink/v3/lavalink"
 	"github.com/disgoorg/json"
+
+	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
 
 var resolve = discord.SlashCommandCreate{
@@ -70,12 +72,7 @@ func (c *Commands) Resolve(data discord.SlashCommandInteractionData, e *handler.
 		content = "LoadType: `empty`"
 	case lavalink.LoadTypeError:
 		ex, _ := result.Data.(lavalink.Exception)
-		if ex.Cause != nil {
-			files = append(files, &discord.File{
-				Name:   "cause.txt",
-				Reader: bytes.NewReader([]byte(*ex.Cause)),
-			})
-		}
+		files = append(files, res.NewExceptionFile(ex.CauseStackTrace))
 		content = fmt.Sprintf("LoadType: `error`\nMessage: %s\nSeverity: %s", ex.Message, ex.Severity)
 	}
 

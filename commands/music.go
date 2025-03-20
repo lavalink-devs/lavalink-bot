@@ -59,6 +59,10 @@ var searchSourceChoices = []discord.ApplicationCommandOptionChoiceString{
 		Name:  "SoundCloud",
 		Value: string(lavalink.SearchTypeSoundCloud),
 	},
+	{
+		Name:  "Tidal",
+		Value: "tdsearch",
+	},
 }
 
 var searchTypeChoices = []discord.ApplicationCommandOptionChoiceString{

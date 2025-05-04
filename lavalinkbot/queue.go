@@ -132,6 +132,10 @@ func (q *PlayerManager) SetRepeatMode(guildID snowflake.ID, mode RepeatMode) {
 }
 
 func (q *PlayerManager) Next(guildID snowflake.ID) (lavalink.Track, bool) {
+	return q.NextCount(guildID, 1)
+}
+
+func (q *PlayerManager) NextCount(guildID snowflake.ID, count int) (lavalink.Track, bool) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
@@ -139,15 +143,16 @@ func (q *PlayerManager) Next(guildID snowflake.ID) (lavalink.Track, bool) {
 	if !ok {
 		return lavalink.Track{}, false
 	}
-	if len(qq.tracks) == 0 {
+	if len(qq.tracks) < count {
 		return lavalink.Track{}, false
 	}
-	track := qq.tracks[0]
+
+	track := qq.tracks[count-1]
 	if qq.mode != RepeatModeTrack {
 		if qq.mode == RepeatModeQueue {
 			qq.tracks = append(qq.tracks, track)
 		}
-		qq.tracks = qq.tracks[1:]
+		qq.tracks = qq.tracks[count:]
 	}
 	return track, true
 }

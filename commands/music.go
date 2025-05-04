@@ -240,6 +240,13 @@ var music = discord.SlashCommandCreate{
 		discord.ApplicationCommandOptionSubCommand{
 			Name:        "skip",
 			Description: "Skips the current track",
+			Options: []discord.ApplicationCommandOption{
+				discord.ApplicationCommandOptionInt{
+					Name:        "count",
+					Description: "The number of tracks to skip",
+					Required:    false,
+				},
+			},
 		},
 		discord.ApplicationCommandOptionSubCommand{
 			Name:        "pause",

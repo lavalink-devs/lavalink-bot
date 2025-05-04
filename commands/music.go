@@ -352,6 +352,7 @@ var music = discord.SlashCommandCreate{
 					Description:  "The index of the track to remove",
 					Required:     true,
 					Autocomplete: true,
+					MinValue:     json.Ptr(0),
 				},
 			},
 		},

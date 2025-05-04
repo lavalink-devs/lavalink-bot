@@ -97,7 +97,7 @@ func main() {
 			r.SlashCommand("/queue", cmds.Queue)
 			r.SlashCommand("/now-playing", cmds.NowPlaying)
 			// r.SlashCommand("/lyrics", cmds.Lyrics)
-			// r.SlashCommand("/remove", cmds.Remove)
+			r.SlashCommand("/remove", cmds.Remove)
 			// r.SlashCommand("/move", cmds.Move)
 			// r.SlashCommand("/swap", cmds.Swap)
 			// r.SlashCommand("/clear", cmds.Clear)

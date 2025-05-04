@@ -76,13 +76,18 @@ func (q *PlayerManager) Add(guildID snowflake.ID, channelID snowflake.ID, tracks
 	qq.tracks = append(qq.tracks, tracks...)
 }
 
-func (q *PlayerManager) Remove(guildID snowflake.ID, from int, to int) {
+func (q *PlayerManager) Remove(guildID snowflake.ID, from int, to int) bool {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
 	qq, ok := q.queues[guildID]
 	if !ok {
-		return
+		return false
+	}
+
+	queueLen := len(qq.tracks)
+	if from >= queueLen || to >= queueLen {
+		return false
 	}
 
 	if to == 0 {
@@ -90,6 +95,7 @@ func (q *PlayerManager) Remove(guildID snowflake.ID, from int, to int) {
 	}
 
 	qq.tracks = append(qq.tracks[:from], qq.tracks[to:]...)
+	return true
 }
 
 func (q *PlayerManager) Clear(guildID snowflake.ID) {

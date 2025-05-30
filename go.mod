@@ -4,8 +4,8 @@ go 1.22.0
 
 require (
 	github.com/adrg/frontmatter v0.2.0
-	github.com/disgoorg/disgo v0.18.15
-	github.com/disgoorg/disgolink/v3 v3.0.4-0.20250131224809-a61f9934fed7
+	github.com/disgoorg/disgo v0.18.16
+	github.com/disgoorg/disgolink/v3 v3.0.5-0.20250425180433-d10bc670c3da
 	github.com/disgoorg/json v1.2.0
 	github.com/disgoorg/lavalyrics-plugin v0.0.0-20240428194130-71a50d68e826
 	github.com/disgoorg/lavasearch-plugin v1.0.1-0.20231229185935-76caa6d35100
@@ -29,9 +29,9 @@ require (
 	github.com/magefile/mage v1.15.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/sasha-s/go-csync v0.0.0-20240107134140-fcbab37b09ad // indirect
-	golang.org/x/crypto v0.32.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
 	golang.org/x/oauth2 v0.25.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
-	golang.org/x/text v0.21.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/text v0.25.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

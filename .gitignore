@@ -1,2 +1,4 @@
 .idea/
 config.yml
+go.work
+go.work.sum

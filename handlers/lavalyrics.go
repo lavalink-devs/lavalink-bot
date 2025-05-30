@@ -9,6 +9,9 @@ import (
 	"github.com/disgoorg/json"
 	"github.com/disgoorg/lavalyrics-plugin"
 	"github.com/topi314/tint"
+
+	"github.com/lavalink-devs/lavalink-bot/internal/res"
+	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 )
 
 func (h *Handlers) OnLyricsFound(p disgolink.Player, event lavalyrics.LyricsFoundEvent) {
@@ -17,24 +20,24 @@ func (h *Handlers) OnLyricsFound(p disgolink.Player, event lavalyrics.LyricsFoun
 		return
 	}
 
-	lyricsMessageID := h.MusicQueue.LyricsMessageID(p.GuildID())
-	if lyricsMessageID == 0 {
-		msg, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
-			Content: "Lyrics found",
-		})
-		if err != nil {
-			slog.Error("failed to send message", tint.Err(err))
-			return
-		}
-		h.MusicQueue.SetLyricsMessageID(p.GuildID(), msg.ID)
+	track := p.Track()
+	if track == nil {
 		return
 	}
 
-	if _, err := h.Client.Rest().UpdateMessage(channelID, lyricsMessageID, discord.MessageUpdate{
-		Content: json.Ptr("Lyrics found"),
-	}); err != nil {
-		slog.Error("failed to update message", tint.Err(err))
+	content := fmt.Sprintf("Lyrics found for %s from `%s`(`%s`)", res.FormatTrack(*track, 0), event.Lyrics.SourceName, event.Lyrics.Provider)
+
+	msg, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
+		Content: content,
+	})
+	if err != nil {
+		slog.Error("failed to send message", tint.Err(err))
+		return
 	}
+	h.MusicQueue.SetLyrics(p.GuildID(), lavalinkbot.Lyrics{
+		MessageID:   msg.ID,
+		BaseMessage: content,
+	})
 }
 
 func (h *Handlers) OnLyricsNotFound(p disgolink.Player, event lavalyrics.LyricsNotFoundEvent) {
@@ -43,23 +46,19 @@ func (h *Handlers) OnLyricsNotFound(p disgolink.Player, event lavalyrics.LyricsN
 		return
 	}
 
-	lyricsMessageID := h.MusicQueue.LyricsMessageID(p.GuildID())
-	if lyricsMessageID == 0 {
-		msg, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
-			Content: "Lyrics not found",
-		})
-		if err != nil {
-			slog.Error("failed to send message", tint.Err(err))
-			return
-		}
-		h.MusicQueue.SetLyricsMessageID(p.GuildID(), msg.ID)
+	track := p.Track()
+	if track == nil {
 		return
 	}
 
-	if _, err := h.Client.Rest().UpdateMessage(channelID, lyricsMessageID, discord.MessageUpdate{
-		Content: json.Ptr("Lyrics not found"),
-	}); err != nil {
-		slog.Error("failed to update message", tint.Err(err))
+	content := fmt.Sprintf("Lyrics not found for %s", res.FormatTrack(*track, 0))
+
+	_, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
+		Content: content,
+	})
+	if err != nil {
+		slog.Error("failed to send message", tint.Err(err))
+		return
 	}
 }
 
@@ -69,13 +68,14 @@ func (h *Handlers) OnLyricsLine(p disgolink.Player, event lavalyrics.LyricsLineE
 		return
 	}
 
-	lyricsMessageID := h.MusicQueue.LyricsMessageID(p.GuildID())
-	if lyricsMessageID == 0 {
+	lyrics := h.MusicQueue.Lyrics(p.GuildID())
+	if lyrics == nil {
 		return
 	}
+	content := fmt.Sprintf("%s\nLine(i: `%d`, t: `%s`, s: `%t`): %s", lyrics.BaseMessage, event.LineIndex, event.Line.Timestamp, event.Skipped, event.Line.Line)
 
-	if _, err := h.Client.Rest().UpdateMessage(channelID, lyricsMessageID, discord.MessageUpdate{
-		Content: json.Ptr(fmt.Sprintf("Line(`%s`): %s", event.Line.Timestamp, event.Line.Line)),
+	if _, err := h.Client.Rest().UpdateMessage(channelID, lyrics.MessageID, discord.MessageUpdate{
+		Content: json.Ptr(content),
 	}); err != nil {
 		slog.Error("failed to update message", tint.Err(err))
 	}

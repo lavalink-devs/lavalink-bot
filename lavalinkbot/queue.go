@@ -8,6 +8,11 @@ import (
 	"github.com/disgoorg/snowflake/v2"
 )
 
+type Lyrics struct {
+	MessageID   snowflake.ID
+	BaseMessage string
+}
+
 type RepeatMode string
 
 const (
@@ -28,10 +33,10 @@ type PlayerManager struct {
 }
 
 type queue struct {
-	tracks          []lavalink.Track
-	mode            RepeatMode
-	channelID       snowflake.ID
-	lyricsMessageID snowflake.ID
+	tracks    []lavalink.Track
+	mode      RepeatMode
+	channelID snowflake.ID
+	lyrics    Lyrics
 }
 
 func (q *PlayerManager) Get(guildID snowflake.ID) (RepeatMode, []lavalink.Track) {
@@ -63,7 +68,7 @@ func (q *PlayerManager) ChannelID(guildID snowflake.ID) snowflake.ID {
 	return qu.channelID
 }
 
-func (q *PlayerManager) SetLyricsMessageID(guildID snowflake.ID, messageID snowflake.ID) {
+func (q *PlayerManager) SetLyrics(guildID snowflake.ID, lyrics Lyrics) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
@@ -71,18 +76,18 @@ func (q *PlayerManager) SetLyricsMessageID(guildID snowflake.ID, messageID snowf
 	if !ok {
 		return
 	}
-	qu.lyricsMessageID = messageID
+	qu.lyrics = lyrics
 }
 
-func (q *PlayerManager) LyricsMessageID(guildID snowflake.ID) snowflake.ID {
+func (q *PlayerManager) Lyrics(guildID snowflake.ID) *Lyrics {
 	q.mu.Lock()
 	defer q.mu.Unlock()
 
 	qu, ok := q.queues[guildID]
 	if !ok {
-		return 0
+		return nil
 	}
-	return qu.lyricsMessageID
+	return &qu.lyrics
 }
 
 func (q *PlayerManager) Add(guildID snowflake.ID, channelID snowflake.ID, tracks ...lavalink.Track) {

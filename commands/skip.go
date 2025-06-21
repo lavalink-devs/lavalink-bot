@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/disgoorg/disgo/discord"
@@ -9,24 +10,30 @@ import (
 	"github.com/disgoorg/disgolink/v3/lavalink"
 )
 
-func (c *Commands) Skip(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+func (c *Commands) Skip(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
+
+	var trackCount = data.Int("count")
+	if trackCount == 0 {
+		trackCount = 1
+	}
+
 	player := c.Lavalink.ExistingPlayer(*e.GuildID())
-	track, ok := c.MusicQueue.Next(*e.GuildID())
+	track, ok := c.MusicQueue.NextCount(*e.GuildID(), trackCount)
 	if !ok {
 		return e.CreateMessage(discord.MessageCreate{
-			Content: "No more tracks in queue",
+			Content: "Not enough tracks to skip",
 			Flags:   discord.MessageFlagEphemeral,
 		})
 	}
 	if err := player.Update(ctx, lavalink.WithTrack(track)); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
-			Content: "Failed to play skip track",
+			Content: "Failed to skip track(s)",
 		})
 	}
 
 	return e.CreateMessage(discord.MessageCreate{
-		Content: "⏭ Skipped track",
+		Content: fmt.Sprintf("⏭ Skipped %d track(s)", trackCount),
 	})
 }

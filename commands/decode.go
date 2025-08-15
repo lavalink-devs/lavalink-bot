@@ -45,7 +45,7 @@ func (c *Commands) Decode(data discord.SlashCommandInteractionData, e *handler.C
 		}
 		var decodedData []byte
 		if decoded != nil {
-			decodedData, _ = json.MarshalIndent(decoded, "", "  ")
+			decodedData = MarshalNoEscape(decoded)
 		}
 
 		msg := jsonMessage(content, decodedData)
@@ -70,7 +70,7 @@ func (c *Commands) Decode(data discord.SlashCommandInteractionData, e *handler.C
 		return err
 	}
 
-	decodedData, _ := json.MarshalIndent(decoded, "", "  ")
+	decodedData := MarshalNoEscape(decoded)
 
 	msg := jsonMessage("", decodedData)
 
@@ -102,4 +102,13 @@ func jsonMessage(msg string, jsonData []byte) message {
 		Content: content,
 		Files:   files,
 	}
+}
+
+func MarshalNoEscape(v any) []byte {
+	b := &bytes.Buffer{}
+	e := json.NewEncoder(b)
+	e.SetEscapeHTML(false)
+	e.SetIndent("", "  ")
+	_ = e.Encode(v)
+	return b.Bytes()
 }

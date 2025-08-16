@@ -6,7 +6,6 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/json"
 
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
@@ -32,13 +31,7 @@ func (c *Commands) NowPlaying(data discord.SlashCommandInteractionData, e *handl
 
 	var files []*discord.File
 	if data.Bool("raw") {
-		decodedData, err := json.MarshalIndent(track, "", "  ")
-		if err != nil {
-			return e.CreateMessage(discord.MessageCreate{
-				Content: fmt.Sprintf("Failed to marshal track: %s", err),
-				Flags:   discord.MessageFlagEphemeral,
-			})
-		}
+		decodedData := MarshalNoEscape(track)
 		files = append(files, &discord.File{
 			Name:   "track.json",
 			Reader: bytes.NewReader(decodedData),

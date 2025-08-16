@@ -49,13 +49,7 @@ func (c *Commands) Resolve(data discord.SlashCommandInteractionData, e *handler.
 	)
 	switch result.LoadType {
 	case lavalink.LoadTypeTrack, lavalink.LoadTypePlaylist, lavalink.LoadTypeSearch:
-		decodedData, err := json.MarshalIndent(result.Data, "", "  ")
-		if err != nil {
-			_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
-				Content: json.Ptr(fmt.Sprintf("failed to resolve identifier: %s", err)),
-			})
-			return err
-		}
+		decodedData := MarshalNoEscape(result.Data)
 
 		if len(decodedData) > 1900 {
 			files = append(files, &discord.File{

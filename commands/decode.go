@@ -105,7 +105,7 @@ func jsonMessage(msg string, jsonData []byte) message {
 }
 
 func MarshalNoEscape(v any) []byte {
-	b := &bytes.Buffer{}
+	b := new(bytes.Buffer)
 	e := json.NewEncoder(b)
 	e.SetEscapeHTML(false)
 	e.SetIndent("", "  ")

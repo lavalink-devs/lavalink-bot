@@ -9,7 +9,6 @@ import (
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/disgolink/v3/disgolink"
 	"github.com/disgoorg/disgolink/v3/lavalink"
-	"github.com/disgoorg/json"
 )
 
 var info = discord.SlashCommandCreate{
@@ -75,12 +74,7 @@ func (c *Commands) InfoLavalink(data discord.SlashCommandInteractionData, e *han
 		nodeInfos[node.Config().Name] = *nodeInfo
 	})
 
-	rawInfo, err := json.MarshalIndent(nodeInfos, "", "  ")
-	if err != nil {
-		return e.CreateMessage(discord.MessageCreate{
-			Content: "Failed to marshal lavalink info: " + err.Error(),
-		})
-	}
+	rawInfo := MarshalNoEscape(nodeInfos)
 
 	return e.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{

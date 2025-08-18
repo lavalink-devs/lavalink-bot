@@ -6,22 +6,22 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
+	"github.com/disgoorg/disgolink/v3/lavalink"
 )
 
-func (c *Commands) Disconnect(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+func (c *Commands) Restart(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-
 	player := c.Lavalink.ExistingPlayer(*e.GuildID())
-	if player != nil {
-		player.Destroy(ctx)
-	}
-	if err := c.Client.UpdateVoiceState(ctx, *e.GuildID(), nil, false, false); err != nil {
+
+	if err := player.Update(ctx, lavalink.WithPosition(0)); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
-			Content: "Failed to disconnect player",
+			Content: "Failed to restart the track.",
+			Flags:   discord.MessageFlagEphemeral,
 		})
 	}
+
 	return e.CreateMessage(discord.MessageCreate{
-		Content: "Disconnected player",
+		Content: "🔄 Replaying the current track.",
 	})
 }

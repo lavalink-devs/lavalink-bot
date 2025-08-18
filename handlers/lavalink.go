@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"sync/atomic"
 	"time"
 
 	"github.com/disgoorg/disgo/discord"
@@ -23,13 +24,13 @@ func (h *Handlers) OnVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {
 		if !ok || event.OldVoiceState.ChannelID == nil {
 			return
 		}
-		var voiceStates int
+		var voiceStates int32
 		h.Client.Caches().VoiceStatesForEach(event.VoiceState.GuildID, func(vs discord.VoiceState) {
-			if *vs.ChannelID == *event.OldVoiceState.ChannelID {
-				voiceStates++
+			if vs.ChannelID != nil && *vs.ChannelID == *event.OldVoiceState.ChannelID {
+				atomic.AddInt32(&voiceStates, 1)
 			}
 		})
-		if voiceStates <= 1 {
+		if atomic.LoadInt32(&voiceStates) <= 1 {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 			if err := h.Client.UpdateVoiceState(ctx, event.VoiceState.GuildID, nil, false, false); err != nil {
@@ -80,15 +81,17 @@ func (h *Handlers) OnTrackStart(p disgolink.Player, event lavalink.TrackStartEve
 }
 
 func (h *Handlers) OnTrackEnd(p disgolink.Player, event lavalink.TrackEndEvent) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 	if !event.Reason.MayStartNext() {
+		p.Destroy(ctx)
 		return
 	}
 	track, ok := h.MusicQueue.Next(p.GuildID())
 	if !ok {
+		p.Destroy(ctx)
 		return
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
 	if err := p.Update(ctx, lavalink.WithTrack(track)); err != nil {
 		channelID := h.MusicQueue.ChannelID(p.GuildID())
 		if channelID == 0 {

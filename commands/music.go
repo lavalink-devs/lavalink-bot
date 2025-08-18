@@ -267,6 +267,18 @@ var music = discord.SlashCommandCreate{
 			},
 		},
 		discord.ApplicationCommandOptionSubCommand{
+			Name:        "join",
+			Description: "Joins a voice channel",
+			Options: []discord.ApplicationCommandOption{
+				discord.ApplicationCommandOptionChannel{
+					Name:         "channel",
+					Description:  "The voice channel to join",
+					Required:     false,
+					ChannelTypes: []discord.ChannelType{discord.ChannelTypeGuildVoice},
+				},
+			},
+		},
+		discord.ApplicationCommandOptionSubCommand{
 			Name:        "volume",
 			Description: "Sets the volume of the player",
 			Options: []discord.ApplicationCommandOption{

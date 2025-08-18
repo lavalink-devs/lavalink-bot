@@ -62,6 +62,30 @@ func (q *PlayerManager) ChannelID(guildID snowflake.ID) snowflake.ID {
 	return qu.channelID
 }
 
+func (q *PlayerManager) Move(guildID snowflake.ID, from, to int) {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+
+	qq, ok := q.queues[guildID]
+	if !ok {
+		return
+	}
+
+	if from < 0 || from >= len(qq.tracks) || to < 0 || to >= len(qq.tracks) {
+		return
+	}
+
+	track := qq.tracks[from]
+
+	qq.tracks = append(qq.tracks[:from], qq.tracks[from+1:]...)
+
+	if to > from {
+		to--
+	}
+
+	qq.tracks = append(qq.tracks[:to], append([]lavalink.Track{track}, qq.tracks[to:]...)...)
+}
+
 func (q *PlayerManager) Add(guildID snowflake.ID, channelID snowflake.ID, tracks ...lavalink.Track) {
 	q.mu.Lock()
 	defer q.mu.Unlock()
@@ -108,7 +132,7 @@ func (q *PlayerManager) Shuffle(guildID snowflake.ID) bool {
 		return false
 	}
 
-	if len(q.queues[guildID].tracks) >= 1 {
+	if len(qq.tracks) <= 1 {
 		return false
 	}
 
@@ -117,6 +141,23 @@ func (q *PlayerManager) Shuffle(guildID snowflake.ID) bool {
 		qq.tracks[i], qq.tracks[j] = qq.tracks[j], qq.tracks[i]
 	}
 
+	return true
+}
+
+func (q *PlayerManager) Swap(guildID snowflake.ID, i, j int) bool {
+	q.mu.Lock()
+	defer q.mu.Unlock()
+
+	qq, ok := q.queues[guildID]
+	if !ok {
+		return false
+	}
+
+	if i < 0 || j < 0 || i >= len(qq.tracks) || j >= len(qq.tracks) {
+		return false
+	}
+
+	qq.tracks[i], qq.tracks[j] = qq.tracks[j], qq.tracks[i]
 	return true
 }
 

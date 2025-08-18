@@ -24,6 +24,9 @@ func (c *Commands) Seek(data discord.SlashCommandInteractionData, e *handler.Com
 	}
 
 	newPosition := lavalink.Duration(position * duration)
+	if newPosition < 0 {
+		newPosition = 0
+	}
 	if err := player.Update(ctx, lavalink.WithPosition(newPosition)); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "Failed to seek to position",
@@ -31,6 +34,6 @@ func (c *Commands) Seek(data discord.SlashCommandInteractionData, e *handler.Com
 	}
 
 	return e.CreateMessage(discord.MessageCreate{
-		Content: fmt.Sprintf("⏩ Seeked to %s", res.FormatDuration(newPosition)),
+		Content: fmt.Sprintf("Seeked to **`%s`**", res.FormatDuration(newPosition)),
 	})
 }

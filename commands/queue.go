@@ -13,7 +13,7 @@ func (c *Commands) Queue(_ discord.SlashCommandInteractionData, e *handler.Comma
 	_, tracks := c.MusicQueue.Get(*e.GuildID())
 	if len(tracks) == 0 {
 		return e.CreateMessage(discord.MessageCreate{
-			Content: fmt.Sprintf("No tracks in queue"),
+			Content: "No tracks in queue",
 		})
 	}
 

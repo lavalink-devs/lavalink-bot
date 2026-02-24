@@ -5,7 +5,7 @@ go 1.26
 require (
 	github.com/adrg/frontmatter v0.2.0
 	github.com/disgoorg/disgo v0.19.2
-	github.com/disgoorg/disgolink/v3 v3.0.5-0.20260222014347-163c6cbf64d5
+	github.com/disgoorg/disgolink/v3 v3.0.5-0.20260224231144-a9f7e1af85c5
 	github.com/disgoorg/json v1.2.0
 	github.com/disgoorg/lavalyrics-plugin v0.0.0-20240428194130-71a50d68e826
 	github.com/disgoorg/lavasearch-plugin v1.0.1-0.20231229185935-76caa6d35100

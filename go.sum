@@ -12,8 +12,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/disgoorg/disgo v0.19.2 h1:9FTTnYZ5RnLX6oybPr18d9+ht2KxIMkG/+HY0ADqTbM=
 github.com/disgoorg/disgo v0.19.2/go.mod h1:rLCcf3vnlyfOTGw8ksVmq5UE5CMzBA0eeA9oeZ+N0x4=
-github.com/disgoorg/disgolink/v3 v3.0.5-0.20260222014347-163c6cbf64d5 h1:msRX8N8zybJcl0zRGe2euIN75djpIdloV/ZCWt2jCYg=
-github.com/disgoorg/disgolink/v3 v3.0.5-0.20260222014347-163c6cbf64d5/go.mod h1:UjHfrC4NT4vzibG3GyqtY5l3aMzFwfkU+B3RiW3AQQ8=
+github.com/disgoorg/disgolink/v3 v3.0.5-0.20260224231144-a9f7e1af85c5 h1:NftC7TC35dE6axjnmoMhMZPEpCKnqn02Q0aQqkFNeJo=
+github.com/disgoorg/disgolink/v3 v3.0.5-0.20260224231144-a9f7e1af85c5/go.mod h1:UjHfrC4NT4vzibG3GyqtY5l3aMzFwfkU+B3RiW3AQQ8=
 github.com/disgoorg/godave v0.1.0 h1:3g0Zqzz+zNaxQTVLfCnl5eZKGqZk6cM/JLLbMKCtZQQ=
 github.com/disgoorg/godave v0.1.0/go.mod h1:OreAC3hpabr39bMVA+jwOVDq1EUPXH5A0XUBiZaDI1Y=
 github.com/disgoorg/json v1.2.0 h1:6e/j4BCfSHIvucG1cd7tJPAOp1RgnnMFSqkvZUtEd1Y=

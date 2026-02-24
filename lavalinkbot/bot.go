@@ -18,12 +18,12 @@ import (
 
 type Bot struct {
 	Cfg        Config
-	Client     bot.Client
+	Client     *bot.Client
 	Maven      *maven.Maven
 	Lavalink   disgolink.Client
 	GitHub     *github.Client
 	MusicQueue *PlayerManager
-	Webhooks   map[string]webhook.Client
+	Webhooks   map[string]*webhook.Client
 	Things     map[string]Thing
 }
 

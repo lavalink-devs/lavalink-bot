@@ -18,17 +18,17 @@ import (
 )
 
 func (h *Handlers) OnVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {
-	if event.VoiceState.UserID != h.Client.ApplicationID() {
-		_, ok := h.Client.Caches().VoiceState(event.VoiceState.GuildID, h.Client.ApplicationID())
+	if event.VoiceState.UserID != h.Client.ApplicationID {
+		_, ok := h.Client.Caches.VoiceState(event.VoiceState.GuildID, h.Client.ApplicationID)
 		if !ok || event.OldVoiceState.ChannelID == nil {
 			return
 		}
 		var voiceStates int
-		h.Client.Caches().VoiceStatesForEach(event.VoiceState.GuildID, func(vs discord.VoiceState) {
+		for vs := range h.Client.Caches.VoiceStates(event.VoiceState.GuildID) {
 			if *vs.ChannelID == *event.OldVoiceState.ChannelID {
 				voiceStates++
 			}
-		})
+		}
 		if voiceStates <= 1 {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
@@ -71,7 +71,7 @@ func (h *Handlers) OnTrackStart(p disgolink.Player, event lavalink.TrackStartEve
 		content += fmt.Sprintf("\nFrom: %s", userData.OriginName)
 	}
 
-	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
+	if _, err := h.Client.Rest.CreateMessage(channelID, discord.MessageCreate{
 		Content:         content,
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
@@ -94,7 +94,7 @@ func (h *Handlers) OnTrackEnd(p disgolink.Player, event lavalink.TrackEndEvent) 
 		if channelID == 0 {
 			return
 		}
-		if _, err = h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
+		if _, err = h.Client.Rest.CreateMessage(channelID, discord.MessageCreate{
 			Content:         "failed to start next track: " + err.Error(),
 			AllowedMentions: &discord.AllowedMentions{},
 		}); err != nil {
@@ -108,7 +108,7 @@ func (h *Handlers) OnTrackException(p disgolink.Player, event lavalink.TrackExce
 	if channelID == 0 {
 		return
 	}
-	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
+	if _, err := h.Client.Rest.CreateMessage(channelID, discord.MessageCreate{
 		Content:         "Track exception: " + event.Exception.Error(),
 		Files:           []*discord.File{res.NewExceptionFile(event.Exception.CauseStackTrace)},
 		AllowedMentions: &discord.AllowedMentions{},
@@ -122,7 +122,7 @@ func (h *Handlers) OnTrackStuck(p disgolink.Player, event lavalink.TrackStuckEve
 	if channelID == 0 {
 		return
 	}
-	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
+	if _, err := h.Client.Rest.CreateMessage(channelID, discord.MessageCreate{
 		Content:         "Track stuck: " + event.Track.Info.Title,
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
@@ -157,7 +157,7 @@ func (h *Handlers) OnSegmentsLoaded(p disgolink.Player, event sponsorblock.Segme
 		}
 		content += line
 	}
-	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
+	if _, err := h.Client.Rest.CreateMessage(channelID, discord.MessageCreate{
 		Content:         content,
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
@@ -170,7 +170,7 @@ func (h *Handlers) OndSegmentSkipped(p disgolink.Player, event sponsorblock.Segm
 	if channelID == 0 {
 		return
 	}
-	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
+	if _, err := h.Client.Rest.CreateMessage(channelID, discord.MessageCreate{
 		Content:         fmt.Sprintf("Segment skipped: %s: %s - %s", event.Segment.Category, res.FormatDuration(event.Segment.Start), res.FormatDuration(event.Segment.End)),
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
@@ -193,7 +193,7 @@ func (h *Handlers) OnChaptersLoaded(p disgolink.Player, event sponsorblock.Chapt
 		}
 		content += line
 	}
-	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
+	if _, err := h.Client.Rest.CreateMessage(channelID, discord.MessageCreate{
 		Content:         content,
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
@@ -206,7 +206,7 @@ func (h *Handlers) OnChapterStarted(p disgolink.Player, event sponsorblock.Chapt
 	if channelID == 0 {
 		return
 	}
-	if _, err := h.Client.Rest().CreateMessage(channelID, discord.MessageCreate{
+	if _, err := h.Client.Rest.CreateMessage(channelID, discord.MessageCreate{
 		Content:         fmt.Sprintf("Chapter started: %s: %s - %s", event.Chapter.Name, res.FormatDuration(event.Chapter.Start), res.FormatDuration(event.Chapter.End)),
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {

@@ -1,11 +1,11 @@
 module github.com/lavalink-devs/lavalink-bot
 
-go 1.24
+go 1.26
 
 require (
 	github.com/adrg/frontmatter v0.2.0
-	github.com/disgoorg/disgo v0.18.16
-	github.com/disgoorg/disgolink/v3 v3.0.5-0.20250621002347-ae1d0a1e44e9
+	github.com/disgoorg/disgo v0.19.2
+	github.com/disgoorg/disgolink/v3 v3.0.5-0.20260222014347-163c6cbf64d5
 	github.com/disgoorg/json v1.2.0
 	github.com/disgoorg/lavalyrics-plugin v0.0.0-20240428194130-71a50d68e826
 	github.com/disgoorg/lavasearch-plugin v1.0.1-0.20231229185935-76caa6d35100
@@ -21,17 +21,21 @@ require (
 )
 
 require (
-	github.com/BurntSushi/toml v1.5.0 // indirect
+	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/ProtonMail/go-crypto v1.3.0 // indirect
-	github.com/cloudflare/circl v1.6.1 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
+	github.com/cloudflare/circl v1.6.3 // indirect
+	github.com/disgoorg/godave v0.1.0 // indirect
+	github.com/disgoorg/json/v2 v2.0.0 // indirect
+	github.com/disgoorg/omit v1.0.0 // indirect
+	github.com/google/go-querystring v1.2.0 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
+	github.com/klauspost/compress v1.18.4 // indirect
 	github.com/magefile/mage v1.15.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/sasha-s/go-csync v0.0.0-20240107134140-fcbab37b09ad // indirect
-	golang.org/x/crypto v0.39.0 // indirect
-	golang.org/x/oauth2 v0.30.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
+	golang.org/x/crypto v0.48.0 // indirect
+	golang.org/x/oauth2 v0.35.0 // indirect
+	golang.org/x/sys v0.41.0 // indirect
+	golang.org/x/text v0.34.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )

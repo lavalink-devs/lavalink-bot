@@ -60,7 +60,7 @@ func main() {
 			Timeout: 10 * time.Second,
 		}),
 		MusicQueue: lavalinkbot.NewPlayerManager(),
-		Webhooks:   make(map[string]webhook.Client),
+		Webhooks:   make(map[string]*webhook.Client),
 		Things:     things,
 	}
 
@@ -141,7 +141,7 @@ func main() {
 	}
 
 	sponsorblockPlugin := sponsorblock.New()
-	if b.Lavalink = disgolink.New(b.Client.ApplicationID(),
+	if b.Lavalink = disgolink.New(b.Client.ApplicationID,
 		disgolink.WithPlugins(sponsorblockPlugin),
 		disgolink.WithListenerFunc(hdlr.OnTrackStart),
 		disgolink.WithListenerFunc(hdlr.OnTrackEnd),

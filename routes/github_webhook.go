@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/rest"
 	"github.com/disgoorg/disgo/webhook"
 	"github.com/google/go-github/v52/github"
 	"github.com/topi314/tint"
@@ -80,9 +81,9 @@ func processReleaseEvent(b *lavalinkbot.Bot, e *github.ReleaseEvent) error {
 		message += "\n…"
 	}
 
-	msg, err := webhookClient.CreateMessage(discord.NewWebhookMessageCreateBuilder().
-		SetContent(discord.RoleMention(cfg.PingRole)).
-		SetEmbeds(discord.NewEmbedBuilder().
+	msg, err := webhookClient.CreateMessage(discord.NewWebhookMessageCreate().
+		WithContent(discord.RoleMention(cfg.PingRole)).
+		WithEmbeds(discord.NewEmbedBuilder().
 			SetAuthor(
 				fmt.Sprintf("%s version %s has been released", repo, e.Release.GetTagName()),
 				e.GetRelease().GetHTMLURL(),
@@ -94,13 +95,15 @@ func processReleaseEvent(b *lavalinkbot.Bot, e *github.ReleaseEvent) error {
 			SetTimestamp(e.GetRelease().GetCreatedAt().Time).
 			Build(),
 		).
-		SetAvatarURL(e.GetRepo().GetOwner().GetAvatarURL()).
-		Build(),
+		WithAvatarURL(e.GetRepo().GetOwner().GetAvatarURL()),
+		rest.CreateWebhookMessageParams{
+			Wait: true,
+		},
 	)
 	if err != nil {
 		return fmt.Errorf("failed to send message: %w", err)
 	}
-	_, err = b.Client.Rest().CrosspostMessage(msg.ChannelID, msg.ID)
+	_, err = b.Client.Rest.CrosspostMessage(msg.ChannelID, msg.ID)
 	if err != nil {
 		return fmt.Errorf("failed to crosspost message: %w", err)
 	}

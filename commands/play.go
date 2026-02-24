@@ -197,7 +197,7 @@ func (c Choices) Swap(i, j int) {
 }
 
 func (c *Commands) Play(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
-	voiceState, ok := c.Client.Caches().VoiceState(*e.GuildID(), e.User().ID)
+	voiceState, ok := c.Client.Caches.VoiceState(*e.GuildID(), e.User().ID)
 	if !ok {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "You need to be in a voice channel to use this command.",
@@ -308,7 +308,7 @@ func (c *Commands) Play(data discord.SlashCommandInteractionData, e *handler.Com
 }
 
 func (c *Commands) PlayTrack(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
-	voiceState, ok := c.Client.Caches().VoiceState(*e.GuildID(), e.User().ID)
+	voiceState, ok := c.Client.Caches.VoiceState(*e.GuildID(), e.User().ID)
 	if !ok {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "You need to be in a voice channel to use this command.",

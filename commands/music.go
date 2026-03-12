@@ -3,7 +3,7 @@ package commands
 import (
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/lavalink"
 	"github.com/disgoorg/json"
 )
 
@@ -164,6 +164,18 @@ var music = discord.SlashCommandCreate{
 					Name:        "track",
 					Description: "The encoded track to play",
 					Required:    true,
+				},
+				discord.ApplicationCommandOptionInt{
+					Name:        "start-time",
+					Description: "The time to start the track at",
+					Required:    false,
+					MinValue:    new(0),
+				},
+				discord.ApplicationCommandOptionInt{
+					Name:        "end-time",
+					Description: "The time to end the track at",
+					Required:    false,
+					MinValue:    new(0),
 				},
 			},
 		},

@@ -18,11 +18,9 @@ import (
 	"github.com/disgoorg/disgo/handler"
 	"github.com/disgoorg/disgo/handler/middleware"
 	"github.com/disgoorg/disgo/webhook"
-	"github.com/disgoorg/disgolink/v3/disgolink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
 	"github.com/disgoorg/sponsorblock-plugin"
 	"github.com/google/go-github/v52/github"
-	"github.com/mattn/go-colorable"
-	"github.com/topi314/tint"
 
 	"github.com/lavalink-devs/lavalink-bot/commands"
 	"github.com/lavalink-devs/lavalink-bot/handlers"
@@ -40,7 +38,7 @@ func main() {
 
 	cfg, err := lavalinkbot.ReadConfig(*path)
 	if err != nil {
-		slog.Error("failed to read config", tint.Err(err))
+		slog.Error("failed to read config", slog.Any("err", err))
 		os.Exit(-1)
 	}
 	setupLogger(cfg.Log)
@@ -49,7 +47,7 @@ func main() {
 
 	things, err := lavalinkbot.ReadThings(Things)
 	if err != nil {
-		slog.Error("failed to read things", tint.Err(err))
+		slog.Error("failed to read things", slog.Any("err", err))
 		os.Exit(-1)
 	}
 
@@ -117,7 +115,7 @@ func main() {
 
 	go func() {
 		if err := http.ListenAndServe(cfg.GitHub.ServerAddr, mux); err != nil && !errors.Is(err, http.ErrServerClosed) {
-			slog.Error("failed to start github webhook server", tint.Err(err))
+			slog.Error("failed to start github webhook server", slog.Any("err", err))
 		}
 	}()
 
@@ -132,12 +130,12 @@ func main() {
 		bot.WithEventListenerFunc(hdlr.OnVoiceStateUpdate),
 		bot.WithEventListenerFunc(hdlr.OnVoiceServerUpdate),
 	); err != nil {
-		slog.Error("failed to create disgo client", tint.Err(err))
+		slog.Error("failed to create disgo client", slog.Any("err", err))
 		os.Exit(-1)
 	}
 
 	if err = handler.SyncCommands(b.Client, commands.CommandCreates, b.Cfg.Bot.GuildIDs); err != nil {
-		slog.Error("failed to sync commands", tint.Err(err))
+		slog.Error("failed to sync commands", slog.Any("err", err))
 	}
 
 	sponsorblockPlugin := sponsorblock.New()
@@ -154,12 +152,12 @@ func main() {
 		disgolink.WithListenerFunc(hdlr.OnChaptersLoaded),
 		disgolink.WithListenerFunc(hdlr.OnChapterStarted),
 	); err != nil {
-		slog.Error("failed to create disgolink client", tint.Err(err))
+		slog.Error("failed to create disgolink client", slog.Any("err", err))
 		os.Exit(-1)
 	}
 
 	if err = b.Start(); err != nil {
-		slog.Error("failed to start bot", tint.Err(err))
+		slog.Error("failed to start bot", slog.Any("err", err))
 		os.Exit(-1)
 	}
 	defer b.Stop()
@@ -170,58 +168,25 @@ func main() {
 	<-s
 }
 
-const (
-	ansiFaint         = "\033[2m"
-	ansiWhiteBold     = "\033[37;1m"
-	ansiYellowBold    = "\033[33;1m"
-	ansiCyanBold      = "\033[36;1m"
-	ansiCyanBoldFaint = "\033[36;1;2m"
-	ansiRedFaint      = "\033[31;2m"
-	ansiRedBold       = "\033[31;1m"
-
-	ansiRed     = "\033[31m"
-	ansiYellow  = "\033[33m"
-	ansiGreen   = "\033[32m"
-	ansiMagenta = "\033[35m"
-)
-
 func setupLogger(cfg lavalinkbot.LogConfig) {
-	var sHandler slog.Handler
+	var h slog.Handler
 	switch cfg.Format {
-	case "json":
-		sHandler = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			AddSource: cfg.AddSource,
-			Level:     cfg.Level,
+	case lavalinkbot.LogFormatJSON:
+		h = slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+			AddSource:   cfg.AddSource,
+			Level:       cfg.Level,
+			ReplaceAttr: nil,
 		})
-
-	case "text":
-		sHandler = tint.NewHandler(colorable.NewColorable(os.Stdout), &tint.Options{
-			AddSource: cfg.AddSource,
-			Level:     cfg.Level,
-			NoColor:   cfg.NoColor,
-			LevelColors: map[slog.Level]string{
-				slog.LevelDebug: ansiMagenta,
-				slog.LevelInfo:  ansiGreen,
-				slog.LevelWarn:  ansiYellow,
-				slog.LevelError: ansiRed,
-			},
-			Colors: map[tint.Kind]string{
-				tint.KindTime:            ansiYellowBold,
-				tint.KindSourceFile:      ansiCyanBold,
-				tint.KindSourceSeparator: ansiCyanBoldFaint,
-				tint.KindSourceLine:      ansiCyanBold,
-				tint.KindMessage:         ansiWhiteBold,
-				tint.KindKey:             ansiFaint,
-				tint.KindSeparator:       ansiFaint,
-				tint.KindValue:           ansiWhiteBold,
-				tint.KindErrorKey:        ansiRedFaint,
-				tint.KindErrorSeparator:  ansiFaint,
-				tint.KindErrorValue:      ansiRedBold,
-			},
+	case lavalinkbot.LogFormatText:
+		h = slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+			AddSource:   cfg.AddSource,
+			Level:       cfg.Level,
+			ReplaceAttr: nil,
 		})
 	default:
-		slog.Error("Unknown log format", slog.String("format", cfg.Format))
+		slog.Error("Unknown log format", slog.String("format", string(cfg.Format)))
 		os.Exit(-1)
 	}
-	slog.SetDefault(slog.New(sHandler))
+
+	slog.SetDefault(slog.New(h))
 }

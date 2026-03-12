@@ -6,7 +6,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
 )
 
 func (c *Commands) Resume(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
@@ -14,7 +14,7 @@ func (c *Commands) Resume(_ discord.SlashCommandInteractionData, e *handler.Comm
 	defer cancel()
 	player := c.Lavalink.ExistingPlayer(*e.GuildID())
 
-	if err := player.Update(ctx, lavalink.WithPaused(false)); err != nil {
+	if err := player.Update(ctx, disgolink.WithPaused(false)); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "Failed to resume player",
 		})

@@ -11,7 +11,6 @@ import (
 	"github.com/disgoorg/disgo/rest"
 	"github.com/disgoorg/disgo/webhook"
 	"github.com/google/go-github/v52/github"
-	"github.com/topi314/tint"
 
 	"github.com/lavalink-devs/lavalink-bot/lavalinkbot"
 )
@@ -31,13 +30,13 @@ func HandleGithubWebhook(b *lavalinkbot.Bot) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		payload, err := github.ValidatePayload(r, []byte(b.Cfg.GitHub.WebhookSecret))
 		if err != nil {
-			slog.Error("Failed to validate payload", tint.Err(err))
+			slog.Error("Failed to validate payload", slog.Any("err", err))
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		event, err := github.ParseWebHook(github.WebHookType(r), payload)
 		if err != nil {
-			slog.Error("Failed to parse webhook", tint.Err(err))
+			slog.Error("Failed to parse webhook", slog.Any("err", err))
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -46,7 +45,7 @@ func HandleGithubWebhook(b *lavalinkbot.Bot) http.HandlerFunc {
 			err = processReleaseEvent(b, e)
 		}
 		if err != nil {
-			slog.Error("Failed to process webhook", tint.Err(err))
+			slog.Error("Failed to process webhook", slog.Any("err", err))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

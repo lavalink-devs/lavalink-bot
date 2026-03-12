@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/lavalink"
 	"github.com/disgoorg/lavasrc-plugin"
 )
 

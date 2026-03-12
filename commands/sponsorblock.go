@@ -10,11 +10,11 @@ import (
 )
 
 func (c *Commands) ShowSponsorblock(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
-	node := c.Lavalink.Player(*e.GuildID()).Node()
+	node := c.Lavalink.Player(*e.GuildID()).Node
 
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-	categories, err := sponsorblock.GetCategories(ctx, node.Rest(), node.SessionID(), *e.GuildID())
+	categories, err := sponsorblock.GetCategories(ctx, node.Rest, node.Config.SessionID, *e.GuildID())
 	if err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "Failed to get categories: " + err.Error(),
@@ -33,7 +33,7 @@ func (c *Commands) ShowSponsorblock(_ discord.SlashCommandInteractionData, e *ha
 }
 
 func (c *Commands) SetSponsorblock(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
-	node := c.Lavalink.Player(*e.GuildID()).Node()
+	node := c.Lavalink.Player(*e.GuildID()).Node
 
 	var categories []sponsorblock.SegmentCategory
 	for _, category := range sponsorblockOptions {
@@ -44,7 +44,7 @@ func (c *Commands) SetSponsorblock(data discord.SlashCommandInteractionData, e *
 
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-	if err := sponsorblock.SetCategories(ctx, node.Rest(), node.SessionID(), *e.GuildID(), categories); err != nil {
+	if err := sponsorblock.SetCategories(ctx, node.Rest, node.Config.SessionID, *e.GuildID(), categories); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "Failed to set categories: " + err.Error(),
 			Flags:   discord.MessageFlagEphemeral,

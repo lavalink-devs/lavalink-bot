@@ -62,7 +62,7 @@ func (c *Commands) Decode(data discord.SlashCommandInteractionData, e *handler.C
 
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-	decoded, err := c.Lavalink.BestNode().Rest().DecodeTrack(ctx, track)
+	decoded, err := c.Lavalink.BestNode().Rest.DecodeTrack(ctx, track)
 	if err != nil {
 		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr(fmt.Sprintf("failed to decode track: %s", err)),

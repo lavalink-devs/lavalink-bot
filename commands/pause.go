@@ -6,7 +6,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
 )
 
 func (c *Commands) Pause(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
@@ -14,7 +14,7 @@ func (c *Commands) Pause(_ discord.SlashCommandInteractionData, e *handler.Comma
 	defer cancel()
 	player := c.Lavalink.ExistingPlayer(*e.GuildID())
 
-	if err := player.Update(ctx, lavalink.WithPaused(true)); err != nil {
+	if err := player.Update(ctx, disgolink.WithPaused(true)); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "Failed to pause player",
 		})

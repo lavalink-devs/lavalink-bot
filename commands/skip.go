@@ -6,7 +6,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
 )
 
 func (c *Commands) Skip(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
@@ -20,7 +20,7 @@ func (c *Commands) Skip(_ discord.SlashCommandInteractionData, e *handler.Comman
 			Flags:   discord.MessageFlagEphemeral,
 		})
 	}
-	if err := player.Update(ctx, lavalink.WithTrack(track)); err != nil {
+	if err := player.Update(ctx, disgolink.WithTrack(track)); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "Failed to play skip track",
 		})

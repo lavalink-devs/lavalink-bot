@@ -12,7 +12,7 @@ import (
 
 func (c *Commands) NowPlaying(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	player := c.Lavalink.Player(*e.GuildID())
-	track := player.Track()
+	track := player.Track
 	if track == nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "There is no track playing.",

@@ -7,13 +7,13 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
 )
 
 func (c *Commands) Volume(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	volume := data.Int("volume")
 	player := c.Lavalink.ExistingPlayer(*e.GuildID())
-	oldVolume := player.Volume()
+	oldVolume := player.Volume
 
 	if volume == oldVolume {
 		return e.CreateMessage(discord.MessageCreate{
@@ -24,7 +24,7 @@ func (c *Commands) Volume(data discord.SlashCommandInteractionData, e *handler.C
 
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-	if err := player.Update(ctx, lavalink.WithVolume(volume)); err != nil {
+	if err := player.Update(ctx, disgolink.WithVolume(volume)); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "Failed to set volume",
 		})

@@ -7,7 +7,8 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
+	"github.com/disgoorg/disgolink/v4/lavalink"
 
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
 )
@@ -24,7 +25,7 @@ func (c *Commands) Seek(data discord.SlashCommandInteractionData, e *handler.Com
 	}
 
 	newPosition := lavalink.Duration(position * duration)
-	if err := player.Update(ctx, lavalink.WithPosition(newPosition)); err != nil {
+	if err := player.Update(ctx, disgolink.WithPosition(newPosition)); err != nil {
 		return e.CreateMessage(discord.MessageCreate{
 			Content: "Failed to seek to position",
 		})

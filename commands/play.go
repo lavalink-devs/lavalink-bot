@@ -10,7 +10,8 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
+	"github.com/disgoorg/disgolink/v4/lavalink"
 	"github.com/disgoorg/json"
 	"github.com/disgoorg/lavasearch-plugin"
 	"github.com/disgoorg/lavasrc-plugin"
@@ -40,7 +41,7 @@ func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 	if urlPattern.MatchString(query) {
 		ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 		defer cancel()
-		result, err := c.Lavalink.BestNode().LoadTracks(ctx, query)
+		result, err := c.Lavalink.BestNode().Rest.LoadTracks(ctx, query)
 		if err != nil {
 			return e.AutocompleteResult([]discord.AutocompleteChoice{
 				discord.AutocompleteChoiceString{
@@ -92,7 +93,7 @@ func (c *Commands) PlayAutocomplete(e *handler.AutocompleteEvent) error {
 
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-	result, err := lavasearch.LoadSearch(ctx, c.Lavalink.BestNode().Rest(), query, types)
+	result, err := lavasearch.LoadSearch(ctx, c.Lavalink.BestNode().Rest, query, types)
 	if err != nil {
 		if errors.Is(err, lavasearch.ErrEmptySearchResult) {
 			return e.AutocompleteResult(nil)
@@ -223,7 +224,7 @@ func (c *Commands) Play(data discord.SlashCommandInteractionData, e *handler.Com
 
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-	result, err := c.Lavalink.BestNode().LoadTracks(ctx, query)
+	result, err := c.Lavalink.BestNode().Rest.LoadTracks(ctx, query)
 	if err != nil {
 		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr(fmt.Sprintf("Failed to load tracks: %s", err)),
@@ -283,7 +284,7 @@ func (c *Commands) Play(data discord.SlashCommandInteractionData, e *handler.Com
 	}
 
 	player := c.Lavalink.Player(*e.GuildID())
-	if player.Track() == nil {
+	if player.Track == nil {
 		var track lavalink.Track
 		if len(tracks) == 1 {
 			track = tracks[0]
@@ -294,7 +295,7 @@ func (c *Commands) Play(data discord.SlashCommandInteractionData, e *handler.Com
 
 		playCtx, playCancel := context.WithTimeout(e.Ctx, 10*time.Second)
 		defer playCancel()
-		if err = player.Update(playCtx, lavalink.WithTrack(track)); err != nil {
+		if err = player.Update(playCtx, disgolink.WithTrack(track)); err != nil {
 			_, err = e.CreateFollowupMessage(discord.MessageCreate{
 				Content: fmt.Sprintf("Failed to play track: %s", err),
 			})
@@ -324,7 +325,7 @@ func (c *Commands) PlayTrack(data discord.SlashCommandInteractionData, e *handle
 
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-	track, err := c.Lavalink.BestNode().DecodeTrack(ctx, encodedTrack)
+	track, err := c.Lavalink.BestNode().Rest.DecodeTrack(ctx, encodedTrack)
 	if err != nil {
 		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr(fmt.Sprintf("Failed to decode track: %s", err)),
@@ -350,11 +351,21 @@ func (c *Commands) PlayTrack(data discord.SlashCommandInteractionData, e *handle
 		return err
 	}
 
+	update := []disgolink.PlayerUpdateOpt{
+		disgolink.WithTrack(*track),
+	}
+	if start, ok := data.OptInt("start-time"); ok {
+		update = append(update, disgolink.WithPosition(lavalink.Duration(time.Duration(start)*time.Millisecond)))
+	}
+	if end, ok := data.OptInt("end-time"); ok {
+		update = append(update, disgolink.WithEndTime(lavalink.Duration(time.Duration(end)*time.Millisecond)))
+	}
+
 	player := c.Lavalink.Player(*e.GuildID())
-	if player.Track() == nil {
+	if player.Track == nil {
 		playCtx, playCancel := context.WithTimeout(e.Ctx, 10*time.Second)
 		defer playCancel()
-		if err = player.Update(playCtx, lavalink.WithTrack(*track)); err != nil {
+		if err = player.Update(playCtx, update...); err != nil {
 			_, err = e.CreateFollowupMessage(discord.MessageCreate{
 				Content: fmt.Sprintf("Failed to play track: %s", err),
 			})

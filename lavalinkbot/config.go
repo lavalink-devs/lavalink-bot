@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/disgoorg/disgolink/v3/disgolink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
 	"github.com/disgoorg/snowflake/v2"
 	"gopkg.in/yaml.v3"
 )
@@ -49,19 +49,24 @@ func (c Config) String() string {
 	)
 }
 
+type LogFormat string
+
+const (
+	LogFormatJSON LogFormat = "json"
+	LogFormatText LogFormat = "text"
+)
+
 type LogConfig struct {
 	Level     slog.Level `yaml:"level"`
-	Format    string     `yaml:"format"`
+	Format    LogFormat  `yaml:"format"`
 	AddSource bool       `yaml:"add_source"`
-	NoColor   bool       `yaml:"no_color"`
 }
 
 func (c LogConfig) String() string {
-	return fmt.Sprintf("\n  Level: %s\n  Format: %s\n  AddSource: %t\n  NoColor: %t\n",
+	return fmt.Sprintf("\n  Level: %s\n  Format: %s\n  AddSource: %t",
 		c.Level,
 		c.Format,
 		c.AddSource,
-		c.NoColor,
 	)
 }
 

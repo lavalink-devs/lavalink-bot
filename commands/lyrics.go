@@ -32,7 +32,7 @@ func (c *Commands) Lyrics(data discord.SlashCommandInteractionData, e *handler.C
 			return err
 		}
 
-		lyrics, err = lavalyrics.GetLyrics(ctx, c.Lavalink.BestNode().Rest(), encodedTrack, skipTrackSource)
+		lyrics, err = lavalyrics.GetLyrics(ctx, c.Lavalink.BestNode().Rest, encodedTrack, skipTrackSource)
 	} else {
 		player := c.Lavalink.ExistingPlayer(*e.GuildID())
 		if player == nil {
@@ -42,7 +42,7 @@ func (c *Commands) Lyrics(data discord.SlashCommandInteractionData, e *handler.C
 			})
 		}
 
-		playingTrack := player.Track()
+		playingTrack := player.Track
 		if playingTrack == nil {
 			return e.CreateMessage(discord.MessageCreate{
 				Content: "no track playing",
@@ -56,7 +56,7 @@ func (c *Commands) Lyrics(data discord.SlashCommandInteractionData, e *handler.C
 			return err
 		}
 
-		lyrics, err = lavalyrics.GetCurrentTrackLyrics(ctx, player.Node().Rest(), player.Node().SessionID(), *e.GuildID(), skipTrackSource)
+		lyrics, err = lavalyrics.GetCurrentTrackLyrics(ctx, player.Node.Rest, player.Node.Config.SessionID, *e.GuildID(), skipTrackSource)
 	}
 	if err != nil {
 		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{

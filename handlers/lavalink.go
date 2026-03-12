@@ -8,10 +8,8 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/events"
-	"github.com/disgoorg/disgolink/v3/disgolink"
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
 	"github.com/disgoorg/sponsorblock-plugin"
-	"github.com/topi314/tint"
 
 	"github.com/lavalink-devs/lavalink-bot/commands"
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
@@ -33,7 +31,7 @@ func (h *Handlers) OnVoiceStateUpdate(event *events.GuildVoiceStateUpdate) {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 			if err := h.Client.UpdateVoiceState(ctx, event.VoiceState.GuildID, nil, false, false); err != nil {
-				slog.Error("failed to disconnect from voice channel", tint.Err(err))
+				slog.Error("failed to disconnect from voice channel", slog.Any("err", err))
 			}
 		}
 		return
@@ -55,8 +53,8 @@ func (h *Handlers) OnVoiceServerUpdate(event *events.VoiceServerUpdate) {
 	h.Lavalink.OnVoiceServerUpdate(ctx, event.GuildID, event.Token, *event.Endpoint)
 }
 
-func (h *Handlers) OnTrackStart(p disgolink.Player, event lavalink.TrackStartEvent) {
-	channelID := h.MusicQueue.ChannelID(p.GuildID())
+func (h *Handlers) OnTrackStart(event *disgolink.PlayerTrackStartEvent) {
+	channelID := h.MusicQueue.ChannelID(event.GuildID)
 	if channelID == 0 {
 		return
 	}
@@ -75,22 +73,22 @@ func (h *Handlers) OnTrackStart(p disgolink.Player, event lavalink.TrackStartEve
 		Content:         content,
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
-		slog.Error("failed to send message", tint.Err(err))
+		slog.Error("failed to send message", slog.Any("err", err))
 	}
 }
 
-func (h *Handlers) OnTrackEnd(p disgolink.Player, event lavalink.TrackEndEvent) {
+func (h *Handlers) OnTrackEnd(event *disgolink.PlayerTrackEndEvent) {
 	if !event.Reason.MayStartNext() {
 		return
 	}
-	track, ok := h.MusicQueue.Next(p.GuildID())
+	track, ok := h.MusicQueue.Next(event.GuildID)
 	if !ok {
 		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if err := p.Update(ctx, lavalink.WithTrack(track)); err != nil {
-		channelID := h.MusicQueue.ChannelID(p.GuildID())
+	if err := event.Player.Update(ctx, disgolink.WithTrack(track)); err != nil {
+		channelID := h.MusicQueue.ChannelID(event.GuildID)
 		if channelID == 0 {
 			return
 		}
@@ -98,13 +96,13 @@ func (h *Handlers) OnTrackEnd(p disgolink.Player, event lavalink.TrackEndEvent) 
 			Content:         "failed to start next track: " + err.Error(),
 			AllowedMentions: &discord.AllowedMentions{},
 		}); err != nil {
-			slog.Error("failed to send message", tint.Err(err))
+			slog.Error("failed to send message", slog.Any("err", err))
 		}
 	}
 }
 
-func (h *Handlers) OnTrackException(p disgolink.Player, event lavalink.TrackExceptionEvent) {
-	channelID := h.MusicQueue.ChannelID(p.GuildID())
+func (h *Handlers) OnTrackException(event *disgolink.PlayerTrackExceptionEvent) {
+	channelID := h.MusicQueue.ChannelID(event.GuildID)
 	if channelID == 0 {
 		return
 	}
@@ -113,12 +111,12 @@ func (h *Handlers) OnTrackException(p disgolink.Player, event lavalink.TrackExce
 		Files:           []*discord.File{res.NewExceptionFile(event.Exception.CauseStackTrace)},
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
-		slog.Error("failed to send message", tint.Err(err))
+		slog.Error("failed to send message", slog.Any("err", err))
 	}
 }
 
-func (h *Handlers) OnTrackStuck(p disgolink.Player, event lavalink.TrackStuckEvent) {
-	channelID := h.MusicQueue.ChannelID(p.GuildID())
+func (h *Handlers) OnTrackStuck(event *disgolink.PlayerTrackStuckEvent) {
+	channelID := h.MusicQueue.ChannelID(event.GuildID)
 	if channelID == 0 {
 		return
 	}
@@ -126,24 +124,24 @@ func (h *Handlers) OnTrackStuck(p disgolink.Player, event lavalink.TrackStuckEve
 		Content:         "Track stuck: " + event.Track.Info.Title,
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
-		slog.Error("failed to send message", tint.Err(err))
+		slog.Error("failed to send message", slog.Any("err", err))
 	}
 }
 
-func (h *Handlers) OnWebSocketClosed(p disgolink.Player, event lavalink.WebSocketClosedEvent) {
-	slog.Info("websocket closed", slog.Int64("guild_id", int64(event.GuildID())), slog.Int("code", event.Code), slog.String("reason", event.Reason))
+func (h *Handlers) OnWebSocketClosed(event *disgolink.PlayerWebSocketClosedEvent) {
+	slog.Info("websocket closed", slog.Int64("guild_id", int64(event.GuildID)), slog.Int("code", event.Code), slog.String("reason", event.Reason))
 }
 
-func (h *Handlers) OnUnknownEvent(p disgolink.Player, event lavalink.UnknownEvent) {
-	slog.Info("unknown event", slog.String("event", string(event.Type())), slog.Int64("guild_id", int64(event.GuildID())), slog.String("data", string(event.Data)))
+func (h *Handlers) OnUnknownPlayerEvent(event *disgolink.UnknownPlayerEvent) {
+	slog.Info("unknown event", slog.String("event", string(event.EventType)), slog.Int64("guild_id", int64(event.GuildID)), slog.String("data", string(event.Data)))
 }
 
-func (h *Handlers) OnUnknownMessage(p disgolink.Player, event lavalink.UnknownMessage) {
+func (h *Handlers) OnUnknownEvent(event *disgolink.UnknownEvent) {
 	slog.Info("unknown message", slog.String("op", string(event.Op())), slog.String("data", string(event.Data)))
 }
 
-func (h *Handlers) OnSegmentsLoaded(p disgolink.Player, event sponsorblock.SegmentsLoadedEvent) {
-	channelID := h.MusicQueue.ChannelID(p.GuildID())
+func (h *Handlers) OnSegmentsLoaded(event *sponsorblock.SegmentsLoadedEvent) {
+	channelID := h.MusicQueue.ChannelID(event.GuildID)
 	if channelID == 0 {
 		return
 	}
@@ -161,12 +159,12 @@ func (h *Handlers) OnSegmentsLoaded(p disgolink.Player, event sponsorblock.Segme
 		Content:         content,
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
-		slog.Error("failed to send message", tint.Err(err))
+		slog.Error("failed to send message", slog.Any("err", err))
 	}
 }
 
-func (h *Handlers) OndSegmentSkipped(p disgolink.Player, event sponsorblock.SegmentSkippedEvent) {
-	channelID := h.MusicQueue.ChannelID(p.GuildID())
+func (h *Handlers) OndSegmentSkipped(event *sponsorblock.SegmentSkippedEvent) {
+	channelID := h.MusicQueue.ChannelID(event.GuildID)
 	if channelID == 0 {
 		return
 	}
@@ -174,12 +172,12 @@ func (h *Handlers) OndSegmentSkipped(p disgolink.Player, event sponsorblock.Segm
 		Content:         fmt.Sprintf("Segment skipped: %s: %s - %s", event.Segment.Category, res.FormatDuration(event.Segment.Start), res.FormatDuration(event.Segment.End)),
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
-		slog.Error("failed to send message", tint.Err(err))
+		slog.Error("failed to send message", slog.Any("err", err))
 	}
 }
 
-func (h *Handlers) OnChaptersLoaded(p disgolink.Player, event sponsorblock.ChaptersLoadedEvent) {
-	channelID := h.MusicQueue.ChannelID(p.GuildID())
+func (h *Handlers) OnChaptersLoaded(event *sponsorblock.ChaptersLoadedEvent) {
+	channelID := h.MusicQueue.ChannelID(event.GuildID)
 	if channelID == 0 {
 		return
 	}
@@ -197,12 +195,12 @@ func (h *Handlers) OnChaptersLoaded(p disgolink.Player, event sponsorblock.Chapt
 		Content:         content,
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
-		slog.Error("failed to send message", tint.Err(err))
+		slog.Error("failed to send message", slog.Any("err", err))
 	}
 }
 
-func (h *Handlers) OnChapterStarted(p disgolink.Player, event sponsorblock.ChapterStartedEvent) {
-	channelID := h.MusicQueue.ChannelID(p.GuildID())
+func (h *Handlers) OnChapterStarted(event *sponsorblock.ChapterStartedEvent) {
+	channelID := h.MusicQueue.ChannelID(event.GuildID)
 	if channelID == 0 {
 		return
 	}
@@ -210,6 +208,6 @@ func (h *Handlers) OnChapterStarted(p disgolink.Player, event sponsorblock.Chapt
 		Content:         fmt.Sprintf("Chapter started: %s: %s - %s", event.Chapter.Name, res.FormatDuration(event.Chapter.Start), res.FormatDuration(event.Chapter.End)),
 		AllowedMentions: &discord.AllowedMentions{},
 	}); err != nil {
-		slog.Error("failed to send message", tint.Err(err))
+		slog.Error("failed to send message", slog.Any("err", err))
 	}
 }

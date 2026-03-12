@@ -7,8 +7,8 @@ import (
 	"github.com/disgoorg/disgo"
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/disgolink/v3/disgolink"
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
+	"github.com/disgoorg/disgolink/v4/lavalink"
 )
 
 var info = discord.SlashCommandCreate{
@@ -26,10 +26,10 @@ var info = discord.SlashCommandCreate{
 	},
 }
 
-func (c *Commands) InfoBot(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+func (c *Commands) InfoBot(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	var fields []discord.EmbedField
-	c.Lavalink.ForNodes(func(node disgolink.Node) {
-		version, err := node.Version(context.TODO())
+	for node := range c.Lavalink.Nodes() {
+		version, err := node.Rest.Version(context.TODO())
 		var versionString string
 		if err != nil {
 			versionString = err.Error()
@@ -37,10 +37,10 @@ func (c *Commands) InfoBot(data discord.SlashCommandInteractionData, e *handler.
 			versionString = version
 		}
 		fields = append(fields, discord.EmbedField{
-			Name:  node.Config().Name,
+			Name:  node.Config.Name,
 			Value: fmt.Sprintf("`%s`", versionString),
 		})
-	})
+	}
 	return e.CreateMessage(discord.MessageCreate{
 		Embeds: []discord.Embed{
 			{
@@ -64,15 +64,15 @@ func (c *Commands) InfoBot(data discord.SlashCommandInteractionData, e *handler.
 	})
 }
 
-func (c *Commands) InfoLavalink(data discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
+func (c *Commands) InfoLavalink(_ discord.SlashCommandInteractionData, e *handler.CommandEvent) error {
 	nodeInfos := map[string]lavalink.Info{}
-	c.Lavalink.ForNodes(func(node disgolink.Node) {
-		nodeInfo, err := node.Info(context.TODO())
+	for node := range c.Lavalink.Nodes() {
+		nodeInfo, err := node.Rest.Info(context.TODO())
 		if err != nil {
-			return
+			continue
 		}
-		nodeInfos[node.Config().Name] = *nodeInfo
-	})
+		nodeInfos[node.Config.Name] = *nodeInfo
+	}
 
 	rawInfo := MarshalNoEscape(nodeInfos)
 

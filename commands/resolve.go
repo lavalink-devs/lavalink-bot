@@ -8,7 +8,7 @@ import (
 
 	"github.com/disgoorg/disgo/discord"
 	"github.com/disgoorg/disgo/handler"
-	"github.com/disgoorg/disgolink/v3/lavalink"
+	"github.com/disgoorg/disgolink/v4/lavalink"
 	"github.com/disgoorg/json"
 
 	"github.com/lavalink-devs/lavalink-bot/internal/res"
@@ -35,7 +35,7 @@ func (c *Commands) Resolve(data discord.SlashCommandInteractionData, e *handler.
 
 	ctx, cancel := context.WithTimeout(e.Ctx, 10*time.Second)
 	defer cancel()
-	result, err := c.Lavalink.BestNode().Rest().LoadTracks(ctx, identifier)
+	result, err := c.Lavalink.BestNode().Rest.LoadTracks(ctx, identifier)
 	if err != nil {
 		_, err = e.UpdateInteractionResponse(discord.MessageUpdate{
 			Content: json.Ptr(fmt.Sprintf("failed to resolve identifier: %s", err)),

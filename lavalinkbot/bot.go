@@ -9,9 +9,8 @@ import (
 
 	"github.com/disgoorg/disgo/bot"
 	"github.com/disgoorg/disgo/webhook"
-	"github.com/disgoorg/disgolink/v3/disgolink"
+	"github.com/disgoorg/disgolink/v4/disgolink"
 	"github.com/google/go-github/v52/github"
-	"github.com/topi314/tint"
 
 	"github.com/lavalink-devs/lavalink-bot/internal/maven"
 )
@@ -20,7 +19,7 @@ type Bot struct {
 	Cfg        Config
 	Client     *bot.Client
 	Maven      *maven.Maven
-	Lavalink   disgolink.Client
+	Lavalink   *disgolink.Client
 	GitHub     *github.Client
 	MusicQueue *PlayerManager
 	Webhooks   map[string]*webhook.Client
@@ -40,7 +39,7 @@ func (b *Bot) Start() error {
 		go func(node NodeConfig) {
 			defer wg.Done()
 			if _, err := b.Lavalink.AddNode(ctx, node.ToNodeConfig()); err != nil {
-				slog.Error("failed to add lavalink node", slog.String("node", node.Name), tint.Err(err))
+				slog.Error("failed to add lavalink node", slog.String("node", node.Name), slog.Any("err", err))
 			} else {
 				slog.Info("added lavalink node", slog.String("node", node.Name))
 			}

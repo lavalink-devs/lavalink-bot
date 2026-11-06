@@ -82,17 +82,16 @@ func processReleaseEvent(b *lavalinkbot.Bot, e *github.ReleaseEvent) error {
 
 	msg, err := webhookClient.CreateMessage(discord.NewWebhookMessageCreate().
 		WithContent(discord.RoleMention(cfg.PingRole)).
-		WithEmbeds(discord.NewEmbedBuilder().
-			SetAuthor(
+		WithEmbeds(discord.NewEmbed().
+			WithAuthor(
 				fmt.Sprintf("%s version %s has been released", repo, e.Release.GetTagName()),
 				e.GetRelease().GetHTMLURL(),
 				e.GetRepo().GetOwner().GetAvatarURL(),
 			).
-			SetDescription(message).
-			SetColor(0xff624a).
-			SetFooter("Release by "+e.GetRelease().GetAuthor().GetLogin(), e.GetRelease().GetAuthor().GetAvatarURL()).
-			SetTimestamp(e.GetRelease().GetCreatedAt().Time).
-			Build(),
+			WithDescription(message).
+			WithColor(0xff624a).
+			WithFooter("Release by "+e.GetRelease().GetAuthor().GetLogin(), e.GetRelease().GetAuthor().GetAvatarURL()).
+			WithTimestamp(e.GetRelease().GetCreatedAt().Time),
 		).
 		WithAvatarURL(e.GetRepo().GetOwner().GetAvatarURL()),
 		rest.CreateWebhookMessageParams{
